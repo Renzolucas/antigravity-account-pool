@@ -183,6 +183,7 @@ async function bootstrap() {
   meta.accounts ||= [];
   meta.events ||= [];
   meta.activeByModel ||= {};
+  meta.autoApproveTools = meta.autoApproveTools === true;
   meta.lowQuotaPercent = Number.isFinite(Number(meta.lowQuotaPercent)) ?
     Math.min(100, Math.max(0, Number(meta.lowQuotaPercent))) : 10;
   for (const account of meta.accounts) account.blockedByModel ||= {};
@@ -399,12 +400,13 @@ async function proxy(req, res) {
   res.writeHead(429, { 'content-type': 'application/json' });
   res.end(JSON.stringify({ error: { code: 429, message: 'Every saved account is currently quota blocked.' } }));
 }
-function launch(mode, projectPath, resume = false) {
+function launch(mode, projectPath, resume = false, skipPermissions = false) {
   return new Promise((resolve, reject) => {
     const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', openWindowPath, '-Mode', mode];
     if (mode === 'Project') {
       args.push('-ProjectPath', projectPath, '-Port', String(port));
       if (resume) args.push('-ContinueConversation');
+      if (skipPermissions) args.push('-SkipPermissions');
     }
     const child = spawn(pwsh, args, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '';
@@ -498,6 +500,7 @@ function status() {
     diagnosticNextLowModel,
     diagnosticNext429Model,
     lowQuotaPercent: meta.lowQuotaPercent,
+    autoApproveTools: !!meta.autoApproveTools,
     quotaCheckError,
     launchBusy: Date.now() < launchBusyUntil,
   };
@@ -587,7 +590,7 @@ async function api(req, res) {
     const info = await fs.stat(projectPath);
     if (!info.isDirectory()) throw new Error('Project path must be a directory.');
     launchBusyUntil = Date.now() + 35_000;
-    const pid = await launch('Project', projectPath, !!body.resume);
+    const pid = await launch('Project', projectPath, !!body.resume, !!meta.autoApproveTools);
     note(`Opened Antigravity CLI for ${path.basename(projectPath)} (process ${pid}).`);
     json(res, 200, { ...status(), pid }); return;
   }
@@ -611,6 +614,13 @@ async function api(req, res) {
     if (!Number.isInteger(value) || value < 0 || value > 100) throw new Error('Enter a whole percentage from 0 to 100.');
     meta.lowQuotaPercent = value;
     note(`Low quota switch threshold set to ${value}%.`);
+    json(res, 200, status()); return;
+  }
+  if (req.url === '/api/settings/auto-approve') {
+    if (typeof body.enabled !== 'boolean') throw new Error('Enabled must be a boolean.');
+    meta.autoApproveTools = body.enabled;
+    await saveMeta();
+    note(body.enabled ? 'Automatic tool approvals enabled.' : 'Automatic tool approvals disabled (safe mode).');
     json(res, 200, status()); return;
   }
   if (req.url === '/api/quota/check') {

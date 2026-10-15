@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory)][ValidateSet('Login','Project')][string]$Mode,
     [string]$ProjectPath,
     [int]$Port = 18454,
-    [switch]$ContinueConversation
+    [switch]$ContinueConversation,
+    [switch]$SkipPermissions
 )
 
 $ErrorActionPreference = 'Stop'
@@ -37,8 +38,10 @@ try {
         [Environment]::SetEnvironmentVariable('CLOUD_CODE_URL', "http://127.0.0.1:$Port", 'Process')
         Push-Location $ProjectPath
         try {
-            if ($ContinueConversation) { & $agyPath -c --dangerously-skip-permissions }
-            else { & $agyPath --dangerously-skip-permissions }
+            $agyArgs = @()
+            if ($ContinueConversation) { $agyArgs += '-c' }
+            if ($SkipPermissions) { $agyArgs += '--dangerously-skip-permissions' }
+            & $agyPath @agyArgs
         } finally { Pop-Location }
     } else {
         $loginPath = Join-Path $PSScriptRoot 'data\login-project'

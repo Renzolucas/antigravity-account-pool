@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory)][ValidateSet('Login','Project')][string]$Mode,
     [string]$ProjectPath,
     [int]$Port = 18454,
-    [switch]$ContinueConversation
+    [switch]$ContinueConversation,
+    [switch]$SkipPermissions
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,6 +16,7 @@ $argsForWindow = @(
 if ($Mode -eq 'Project') {
     $argsForWindow += @('-ProjectPath', ('"' + $ProjectPath + '"'), '-Port', [string]$Port)
     if ($ContinueConversation) { $argsForWindow += '-ContinueConversation' }
+    if ($SkipPermissions) { $argsForWindow += '-SkipPermissions' }
 }
 $workingDirectory = if ($Mode -eq 'Project') { $ProjectPath } else { $PSScriptRoot }
 $process = Start-Process -FilePath $pwshPath -ArgumentList $argsForWindow `

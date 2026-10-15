@@ -16,12 +16,15 @@ foreach ($runtime in @($PowerShell7Path, $NodePath)) {
 New-Item -ItemType Directory -Path $InstallRoot -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $InstallRoot 'public') -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $InstallRoot 'data') -Force | Out-Null
-$files = @('server.mjs', 'oauth-client.mjs', 'quota-policy.mjs', 'quota-policy.test.mjs', 'package.json', 'README.md',
+$files = @('server.mjs', 'oauth-client.mjs', 'quota-policy.mjs', 'quota-policy.test.mjs', 'locales.test.mjs', 'auto-approve.test.mjs', 'package.json', 'README.md',
     'AgyCredential.ps1', 'CredentialBridge.ps1', 'Launch-Agy.ps1', 'Open-AgyWindow.ps1',
     'Restore-AgySettings.ps1', 'Runtime-AgyPool.ps1', 'Start-AgyPool.ps1', 'Open-AgyPool.ps1',
     'Complete-Install.ps1', 'Tray-AgyPool.ps1')
 foreach ($name in $files) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $name) -Destination (Join-Path $InstallRoot $name) -Force }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'public\index.html') -Destination (Join-Path $InstallRoot 'public\index.html') -Force
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'public\locales')) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'public\locales') -Destination (Join-Path $InstallRoot 'public\locales') -Recurse -Force
+}
 @{ pwsh = $PowerShell7Path; node = $NodePath } | ConvertTo-Json |
     Set-Content -LiteralPath (Join-Path $InstallRoot 'runtime.json') -Encoding UTF8
 if (-not (Test-Path -LiteralPath (Join-Path $InstallRoot 'install-pending.json'))) {

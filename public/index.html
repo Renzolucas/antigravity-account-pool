@@ -193,6 +193,12 @@ button.primary{background:var(--accent);border-color:var(--accent);color:var(--a
 button.primary:hover{background:var(--accent);filter:brightness(1.08)}
 .saved-project,.model-info{background:none;border:1px solid var(--border);border-radius:6px}
 .model-info{padding:10px}
+.auto-approve-card{margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--inset)}
+.auto-approve-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.auto-approve-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.auto-approve-label{font-size:12px;font-weight:600;color:var(--text)}
+.auto-approve-desc{margin:7px 0 0;font-size:11px;line-height:1.45;color:var(--subtle)}
+.badge.active-badge{background:var(--accent);color:var(--accent-text)}
 .event{border-color:var(--border);font-size:11px}.event.switch{border-color:var(--accent)}
 .message,.notice{border-radius:6px;padding:9px 12px;box-shadow:none}
 .account-menu[open] .menu{border-radius:6px;box-shadow:0 7px 20px var(--shadow)}
@@ -244,48 +250,168 @@ button.primary:hover{background:var(--accent);filter:brightness(1.08)}
 </style>
 </head>
 <body><main>
-<header class="topbar"><div><h1>Account pool</h1><p class="lead">Antigravity CLI</p></div><div class="header-actions"><label class="theme-picker" for="theme"><span>Theme</span><select id="theme" aria-label="Dashboard theme"><option value="sage">Sage</option><option value="ocean">Ocean</option><option value="plum" selected>Plum</option><option value="midnight">Midnight</option><option value="sand">Sand</option><option value="paper">Paper</option></select></label><div id="connection" class="connection" data-state="connecting" role="status"><span id="connectionText">Connecting</span></div></div></header>
+<header class="topbar"><div><h1 data-i18n="appTitle">Account pool</h1><p class="lead" data-i18n="appSubtitle">Antigravity CLI</p></div><div class="header-actions"><label class="theme-picker" for="lang"><span data-i18n="langLabel">Language</span><select id="lang" aria-label="Interface language" data-i18n-aria="langAria"><option value="en">English</option><option value="pt-BR">Português (Brasil)</option></select></label><label class="theme-picker" for="theme"><span data-i18n="themeLabel">Theme</span><select id="theme" aria-label="Dashboard theme" data-i18n-aria="themeAria"><option value="sage" data-i18n="themes.sage">Sage</option><option value="ocean" data-i18n="themes.ocean">Ocean</option><option value="plum" selected data-i18n="themes.plum">Plum</option><option value="midnight" data-i18n="themes.midnight">Midnight</option><option value="sand" data-i18n="themes.sand">Sand</option><option value="paper" data-i18n="themes.paper">Paper</option></select></label><div id="connection" class="connection" data-state="connecting" role="status"><span id="connectionText" data-i18n="connectionState.connecting">Connecting</span></div></div></header>
 <div id="connectionNotice" class="notice" role="status" hidden></div><div id="message" class="message" role="status" hidden></div>
-<section class="overview" aria-label="Quota availability">
-<div class="summary"><div class="summary-head"><h2>Gemini</h2><span id="geminiCoverage" class="coverage">Checking…</span></div><div class="aggregate-value" title="Average of each account’s lower 5-hour or weekly remaining quota; blocked accounts count as zero"><strong id="geminiEffective">—</strong><span>available overall</span></div><div id="geminiChart" class="aggregate-chart" role="img" aria-label="Gemini quota chart"><div class="aggregate-row"><span>5 hours</span><div class="aggregate-track"><div class="aggregate-fill five"></div></div><strong id="geminiFive">—</strong></div><div class="aggregate-row week"><span>Weekly</span><div class="aggregate-track"><div class="aggregate-fill"></div></div><strong id="geminiWeek">—</strong></div></div><div class="summary-foot"><span id="geminiAvailable">Checking quotas…</span><span id="geminiSummary">5-hour and weekly limits</span></div><p id="geminiTokens" class="token-note">Exact token total unavailable from quota readings.</p></div>
-<div class="summary other"><div class="summary-head"><h2>Claude / GPT</h2><span id="otherCoverage" class="coverage">Checking…</span></div><div class="aggregate-value" title="Average of each account’s lower 5-hour or weekly remaining quota; blocked accounts count as zero"><strong id="otherEffective">—</strong><span>available overall</span></div><div id="otherChart" class="aggregate-chart" role="img" aria-label="Claude and GPT quota chart"><div class="aggregate-row"><span>5 hours</span><div class="aggregate-track"><div class="aggregate-fill five"></div></div><strong id="otherFive">—</strong></div><div class="aggregate-row week"><span>Weekly</span><div class="aggregate-track"><div class="aggregate-fill"></div></div><strong id="otherWeek">—</strong></div></div><div class="summary-foot"><span id="otherAvailable">Checking quotas…</span><span id="otherSummary">5-hour and weekly limits</span></div><p id="otherTokens" class="token-note">Exact token total unavailable from quota readings.</p></div>
+<section class="overview" aria-label="Quota availability" data-i18n-aria="overviewAria">
+<div class="summary"><div class="summary-head"><h2>Gemini</h2><span id="geminiCoverage" class="coverage" data-i18n="checking">Checking…</span></div><div class="aggregate-value" title="Average of each account’s lower 5-hour or weekly remaining quota; blocked accounts count as zero" data-i18n-title="aggregateTooltip"><strong id="geminiEffective">—</strong><span data-i18n="availableOverall">available overall</span></div><div id="geminiChart" class="aggregate-chart" role="img" aria-label="Gemini quota chart" data-i18n-aria="chartImgAria.gemini"><div class="aggregate-row"><span data-i18n="fiveHours">5 hours</span><div class="aggregate-track"><div class="aggregate-fill five"></div></div><strong id="geminiFive">—</strong></div><div class="aggregate-row week"><span data-i18n="weekly">Weekly</span><div class="aggregate-track"><div class="aggregate-fill"></div></div><strong id="geminiWeek">—</strong></div></div><div class="summary-foot"><span id="geminiAvailable" data-i18n="checkingQuotas">Checking quotas…</span><span id="geminiSummary" data-i18n="limitsSummary">5-hour and weekly limits</span></div><p id="geminiTokens" class="token-note" data-i18n="tokenNote">Exact token total unavailable from quota readings.</p></div>
+<div class="summary other"><div class="summary-head"><h2>Claude / GPT</h2><span id="otherCoverage" class="coverage" data-i18n="checking">Checking…</span></div><div class="aggregate-value" title="Average of each account’s lower 5-hour or weekly remaining quota; blocked accounts count as zero" data-i18n-title="aggregateTooltip"><strong id="otherEffective">—</strong><span data-i18n="availableOverall">available overall</span></div><div id="otherChart" class="aggregate-chart" role="img" aria-label="Claude and GPT quota chart" data-i18n-aria="chartImgAria.other"><div class="aggregate-row"><span data-i18n="fiveHours">5 hours</span><div class="aggregate-track"><div class="aggregate-fill five"></div></div><strong id="otherFive">—</strong></div><div class="aggregate-row week"><span data-i18n="weekly">Weekly</span><div class="aggregate-track"><div class="aggregate-fill"></div></div><strong id="otherWeek">—</strong></div></div><div class="summary-foot"><span id="otherAvailable" data-i18n="checkingQuotas">Checking quotas…</span><span id="otherSummary" data-i18n="limitsSummary">5-hour and weekly limits</span></div><p id="otherTokens" class="token-note" data-i18n="tokenNote">Exact token total unavailable from quota readings.</p></div>
 </section>
 <section class="panel workspace-panel" aria-labelledby="workspaceTitle">
  <div class="head">
-  <div><div class="workspace-heading"><h2 id="workspaceTitle">The office</h2><span id="workspaceCount" class="workspace-count">Waiting for accounts</span></div><p class="workspace-note">A desk for every account. One shared room.</p></div>
-  <div class="workspace-tools"><div class="workspace-fun" role="group" aria-label="Break-time activities (decorative)"><button data-fun="coffee" class="ghost" type="button" title="Send someone for a coffee">Coffee run</button><button data-fun="pong" class="ghost" type="button" title="Start a ping-pong match">Ping-pong</button><button data-fun="arcade" class="ghost" type="button" title="Send someone to the arcade cabinet">Arcade</button><button data-fun="chat" class="ghost" type="button" title="Start a chat between two characters">Chat</button></div><button id="workspaceChat" class="ghost" type="button" aria-pressed="true" title="Show or hide speech bubbles">Chat: on</button><button id="workspaceMotion" class="ghost" type="button" aria-pressed="false">Pause motion</button></div>
+  <div><div class="workspace-heading"><h2 id="workspaceTitle" data-i18n="officeTitle">The office</h2><span id="workspaceCount" class="workspace-count" data-i18n="officeWaiting">Waiting for accounts</span></div><p class="workspace-note" data-i18n="officeSubtitle">A desk for every account. One shared room.</p></div>
+  <div class="workspace-tools"><div class="workspace-fun" role="group" aria-label="Break-time activities (decorative)" data-i18n-aria="officeToolsAria"><button data-fun="coffee" class="ghost" type="button" title="Send someone for a coffee" data-i18n="officeFun.coffee" data-i18n-title="officeFun.coffeeTitle">Coffee run</button><button data-fun="pong" class="ghost" type="button" title="Start a ping-pong match" data-i18n="officeFun.pong" data-i18n-title="officeFun.pongTitle">Ping-pong</button><button data-fun="arcade" class="ghost" type="button" title="Send someone to the arcade cabinet" data-i18n="officeFun.arcade" data-i18n-title="officeFun.arcadeTitle">Arcade</button><button data-fun="chat" class="ghost" type="button" title="Start a chat between two characters" data-i18n="officeFun.chat" data-i18n-title="officeFun.chatTitle">Chat</button></div><button id="workspaceChat" class="ghost" type="button" aria-pressed="true" title="Show or hide speech bubbles" data-i18n="officeChatOn" data-i18n-title="officeChatTitle">Chat: on</button><button id="workspaceMotion" class="ghost" type="button" aria-pressed="false" data-i18n="officeMotionPause" data-i18n-title="officeMotionTitle">Pause motion</button></div>
  </div>
  <div id="workspace" class="workspace-room">
   <div id="workspaceStage" class="workspace-stage">
-   <canvas id="workspaceCanvas" class="workspace-scene" width="680" height="310" role="img" aria-label="A shared pixel office for your accounts"></canvas>
+   <canvas id="workspaceCanvas" class="workspace-scene" width="680" height="310" role="img" aria-label="A shared pixel office for your accounts" data-i18n-aria="officeCanvasAria"></canvas>
    <div id="workspaceTooltip" class="workspace-tooltip" hidden></div>
-   <div id="workspaceEmpty" class="workspace-empty" hidden><strong>Your office is empty</strong><p>Add an account below to give your first agent a desk.</p></div>
+   <div id="workspaceEmpty" class="workspace-empty" hidden><strong data-i18n="officeEmptyTitle">Your office is empty</strong><p data-i18n="officeEmptyDesc">Add an account below to give your first agent a desk.</p></div>
   </div>
-  <div class="workspace-caption"><div class="workspace-legend"><span><i class="workspace-key"></i>Live request</span><span><i class="workspace-key idle"></i>Idle</span></div><span>Idle movement, chatter and games are decorative. Select a character to inspect its activity.</span></div>
+  <div class="workspace-caption"><div class="workspace-legend"><span><i class="workspace-key"></i><span data-i18n="officeLegendLive">Live request</span></span><span><i class="workspace-key idle"></i><span data-i18n="officeLegendIdle">Idle</span></span></div><span data-i18n="officeLegendDesc">Idle movement, chatter and games are decorative. Select a character to inspect its activity.</span></div>
   <div id="workspaceChatter" class="workspace-chatter" aria-hidden="true"></div>
-  <div id="workspaceRoster" class="workspace-roster" aria-label="Account characters"></div>
-  <div id="workspaceInspector" class="workspace-inspector"><div class="workspace-inspector-copy"><div id="workspaceInspectorLine" class="workspace-inspector-line">Select a character or an account above.</div><div id="workspaceInspectorModel" class="workspace-inspector-model">Typing follows live model requests in your CLI.</div></div><button id="workspaceClear" type="button" class="ghost" hidden>Clear selection</button></div>
+  <div id="workspaceRoster" class="workspace-roster" aria-label="Account characters" data-i18n-aria="officeRosterAria"></div>
+  <div id="workspaceInspector" class="workspace-inspector"><div class="workspace-inspector-copy"><div id="workspaceInspectorLine" class="workspace-inspector-line" data-i18n="officeInspectorSelect">Select a character or an account above.</div><div id="workspaceInspectorModel" class="workspace-inspector-model" data-i18n="officeInspectorTyping">Typing follows live model requests in your CLI.</div></div><button id="workspaceClear" type="button" class="ghost" hidden data-i18n="officeClearSelection">Clear selection</button></div>
  </div>
 </section>
 <div class="grid">
-<section class="panel"><div class="head"><h2>Accounts <span id="accountCount" class="badge">0</span></h2><div class="row"><button id="checkQuota" class="ghost" data-online disabled>Refresh quotas</button><button id="add" class="primary" data-online disabled>Add account</button></div></div>
-<p id="quotaWarning" class="hint" hidden></p><div id="accounts" class="accounts"></div><p id="enrollment" class="hint"></p><button id="cancel" class="ghost" data-online hidden>Cancel account login</button></section>
-<div class="sidebar"><section class="panel"><div class="head"><h2>Open a project</h2></div>
-<div class="stack"><label for="project">Project folder</label><input id="project" type="text" placeholder="C:\path\to\project" autocomplete="off"><label class="row"><input id="resume" type="checkbox" checked> Continue latest conversation</label><button id="launch" class="primary" data-online disabled>Open project in Antigravity CLI</button><button id="pinProject" class="ghost">Pin this folder</button></div>
-<p class="hint">Automatic tool approvals. Account switches keep the model and CLI session.</p><div class="model-info">Last requested model<strong id="model">No project prompt yet</strong><span id="group" class="hint"></span></div>
-<div class="section-label">Pinned &amp; recent projects</div><div id="projects" class="project-list"></div><p id="storageNotice" class="hint" hidden></p></section>
-<section class="panel"><div class="head"><h2>Activity</h2><select id="eventFilter" aria-label="Activity filter"><option value="all">All activity</option><option value="switch">Account switches</option><option value="quota">Quota events</option></select></div><ul id="events" class="events"></ul></section>
-<details class="panel advanced"><summary>Advanced settings &amp; diagnostics</summary><div class="advanced-content">
-<div><h3>Early switching</h3><div class="row"><label for="threshold">Switch at</label><input id="threshold" type="number" min="0" max="100" step="1" value="10"><span>% remaining</span><button id="saveThreshold" class="ghost" data-online disabled>Save</button></div><p class="hint">Checked for the model used by each request. 0% disables early switching; quota error retries still work.</p></div>
-<div><h3>Switch tests</h3><p class="hint">After a project prompt, arm a test and send another small prompt in the same CLI. A test uses some quota from the next account.</p><div class="row"><button id="testLow" class="ghost" data-online disabled>Test low quota switch</button><button id="test" class="ghost" data-online disabled>Test quota error retry</button></div></div>
-<div><h3>Account health</h3><p class="hint">Renew the access token for the account serving the last requested model.</p><div class="row"><button id="refresh" class="ghost" data-online disabled>Check token renewal</button></div></div>
-<div><h3>Stop the pool</h3><p class="hint">Open CLI sessions need the pool to send requests. Finish your tasks before stopping it. Use the Desktop shortcut to start again.</p><div class="row"><button id="stop" class="danger" data-online disabled>Stop app</button></div></div>
-</div></details></div></div><footer>Quota figures show remaining capacity. Refreshes every minute. Hover a reset countdown for its exact time.</footer>
+<section class="panel"><div class="head"><h2><span data-i18n="accountsTitle">Accounts</span> <span id="accountCount" class="badge">0</span></h2><div class="row"><button id="checkQuota" class="ghost" data-online disabled data-i18n="refreshQuotasBtn">Refresh quotas</button><button id="add" class="primary" data-online disabled data-i18n="addAccountBtn">Add account</button></div></div>
+<p id="quotaWarning" class="hint" hidden></p><div id="accounts" class="accounts"></div><p id="enrollment" class="hint"></p><button id="cancel" class="ghost" data-online hidden data-i18n="cancelLoginBtn">Cancel account login</button></section>
+<div class="sidebar"><section class="panel"><div class="head"><h2 data-i18n="openProjectTitle">Open a project</h2></div>
+<div class="stack"><label for="project" data-i18n="projectFolderLabel">Project folder</label><input id="project" type="text" placeholder="C:\path\to\project" data-i18n-placeholder="projectFolderPlaceholder" autocomplete="off"><label class="row"><input id="resume" type="checkbox" checked> <span data-i18n="continueConversation">Continue latest conversation</span></label><button id="launch" class="primary" data-online disabled data-i18n="openProjectBtn">Open project in Antigravity CLI</button><button id="pinProject" class="ghost" data-i18n="pinFolderBtn">Pin this folder</button></div>
+<div class="auto-approve-card">
+  <div class="auto-approve-top">
+    <div class="auto-approve-info">
+      <span class="auto-approve-label" data-i18n="autoApproveTitle">Automatic tool approvals</span>
+      <span id="autoApproveBadge" class="badge">Disabled</span>
+    </div>
+    <button id="toggleAutoApprove" class="ghost" type="button" data-online disabled data-i18n="autoApproveEnableBtn">Enable</button>
+  </div>
+  <p id="autoApproveDesc" class="hint auto-approve-desc" data-i18n="autoApproveSafeDesc">Safe mode: CLI asks for approval before executing tools that require authorization. Applies to new sessions.</p>
+</div>
+<p class="hint" data-i18n="projectHint">Account switches keep the model and CLI session across prompts.</p><div class="model-info"><span data-i18n="lastRequestedModelLabel">Last requested model</span><strong id="model" data-i18n="noProjectPromptYet">No project prompt yet</strong><span id="group" class="hint"></span></div>
+<div class="section-label" data-i18n="pinnedProjectsLabel">Pinned &amp; recent projects</div><div id="projects" class="project-list"></div><p id="storageNotice" class="hint" hidden data-i18n="storageUnavailableNotice"></p></section>
+<section class="panel"><div class="head"><h2 data-i18n="activityTitle">Activity</h2><select id="eventFilter" aria-label="Activity filter" data-i18n-aria="activityFilterAria"><option value="all" data-i18n="filterAll">All activity</option><option value="switch" data-i18n="filterSwitch">Account switches</option><option value="quota" data-i18n="filterQuota">Quota events</option></select></div><ul id="events" class="events"></ul></section>
+<details class="panel advanced"><summary data-i18n="advancedTitle">Advanced settings &amp; diagnostics</summary><div class="advanced-content">
+<div><h3 data-i18n="earlySwitchingTitle">Early switching</h3><div class="row"><label for="threshold" data-i18n="switchAtLabel">Switch at</label><input id="threshold" type="number" min="0" max="100" step="1" value="10"><span data-i18n="percentRemaining">% remaining</span><button id="saveThreshold" class="ghost" data-online disabled data-i18n="saveBtn">Save</button></div><p class="hint" data-i18n="earlySwitchingHint">Checked for the model used by each request. 0% disables early switching; quota error retries still work.</p></div>
+<div><h3 data-i18n="switchTestsTitle">Switch tests</h3><p class="hint" data-i18n="switchTestsHint">After a project prompt, arm a test and send another small prompt in the same CLI. A test uses some quota from the next account.</p><div class="row"><button id="testLow" class="ghost" data-online disabled data-i18n="testLowBtn">Test low quota switch</button><button id="test" class="ghost" data-online disabled data-i18n="testRetryBtn">Test quota error retry</button></div></div>
+<div><h3 data-i18n="accountHealthTitle">Account health</h3><p class="hint" data-i18n="accountHealthHint">Renew the access token for the account serving the last requested model.</p><div class="row"><button id="refresh" class="ghost" data-online disabled data-i18n="checkTokenRenewalBtn">Check token renewal</button></div></div>
+<div><h3 data-i18n="stopPoolTitle">Stop the pool</h3><p class="hint" data-i18n="stopPoolHint">Open CLI sessions need the pool to send requests. Finish your tasks before stopping it. Use the Desktop shortcut to start again.</p><div class="row"><button id="stop" class="danger" data-online disabled data-i18n="stopAppBtn">Stop app</button></div></div>
+</div></details></div></div><footer data-i18n="footerNote">Quota figures show remaining capacity. Refreshes every minute. Hover a reset countdown for its exact time.</footer>
 </main>
 <script nonce="__AGY_POOL_KEY__">
 const key = '__AGY_POOL_KEY__';
 let requestKey = key;
-const $ = id => document.getElementById(id), STORAGE = 'agy-pool.projects.v1', THEME_STORAGE = 'agy-pool.theme.v1', STALE_MS = 90000;
+const $ = id => document.getElementById(id), STORAGE = 'agy-pool.projects.v1', THEME_STORAGE = 'agy-pool.theme.v1', LANG_STORAGE = 'agy-pool.lang.v1', STALE_MS = 90000;
+const I18N = {
+  en: {"appTitle":"Account pool","appSubtitle":"Antigravity CLI","themeLabel":"Theme","themeAria":"Dashboard theme","langLabel":"Language","langAria":"Interface language","themes":{"sage":"Sage","ocean":"Ocean","plum":"Plum","midnight":"Midnight","sand":"Sand","paper":"Paper"},"connectionState":{"connecting":"Connecting","running":"Connected","reconnecting":"Reconnecting","offline":"Unavailable","stopped":"Stopped"},"connectionNotice":{"stopped":"The pool is stopped. Double-click the Desktop shortcut to start it again.","offline":"Cannot reach the pool. Open the Desktop shortcut if it is stopped. Quota readings below are stale; this page will reconnect automatically.","reconnecting":"Connection interrupted. Retrying automatically; quota readings below are stale."},"overviewAria":"Quota availability","checking":"Checking…","availableOverall":"available overall","aggregateTooltip":"Average of each account’s lower 5-hour or weekly remaining quota; blocked accounts count as zero","fiveHours":"5 hours","weekly":"Weekly","checkingQuotas":"Checking quotas…","limitsSummary":"5-hour and weekly limits","tokenNote":"Exact token total unavailable from quota readings.","reportingCount":"{complete} / {total} reporting","accountsReady":"{ready} of {total} accounts ready","readingsStale":"Readings are stale","summaryStatus":"{low} low or blocked · {unknown} unconfirmed","tokenCountNote":"Token total unavailable. Quotas are reported as percentages across {total} accounts.","chartAria":"{group} quota: 5-hour {five} average remaining; weekly {week} average remaining; usable overall {usable}; {complete} of {total} accounts fully confirmed.","chartImgAria":{"gemini":"Gemini quota chart","other":"Claude and GPT quota chart"},"officeTitle":"The office","officeWaiting":"Waiting for accounts","officeSubtitle":"A desk for every account. One shared room.","officeToolsAria":"Break-time activities (decorative)","officeFun":{"coffee":"Coffee run","coffeeTitle":"Send someone for a coffee","pong":"Ping-pong","pongTitle":"Start a ping-pong match","arcade":"Arcade","arcadeTitle":"Send someone to the arcade cabinet","chat":"Chat","chatTitle":"Start a chat between two characters"},"officeChatOn":"Chat: on","officeChatOff":"Chat: off","officeChatTitle":"Show or hide speech bubbles","officeMotionPause":"Pause motion","officeMotionResume":"Resume motion","officeMotionReduced":"Motion reduced","officeMotionTitle":"Pause decorative movement. Live activity still updates.","officeMotionReducedTitle":"Follows your system’s reduced motion preference","officeEmptyTitle":"Your office is empty","officeEmptyDesc":"Add an account below to give your first agent a desk.","officeCanvasAria":"A shared pixel office for your accounts","officeCanvasAriaDynamic":"Shared office with {total} account characters; {working} currently handling model requests. Break-time chatter and games are decorative. Use the account buttons below to inspect each character.","officeLegendLive":"Live request","officeLegendIdle":"Idle","officeLegendDesc":"Idle movement, chatter and games are decorative. Select a character to inspect its activity.","officeRosterAria":"Account characters","officeInspectorSelect":"Select a character or an account above.","officeInspectorTyping":"Typing follows live model requests in your CLI. Break-time play is decorative.","officeClearSelection":"Clear selection","officeStateWorkingRequests":"Working · {count} requests","officeStateWorking":"Working","officeStateRecent":"Recently active","officeStateOffline":"Unavailable","officeStateIdle":"Idle","officeInspectorOffline":"The pool is unavailable. Activity will reconnect with the dashboard.","officeInspectorCurrentModel":"Current model: ","officeInspectorLastModel":"Last model: ","officeInspectorLastActive":" · Last active {time}","officeInspectorNoModel":"No model request observed for this account yet.","officeInspectorBreak":" · On a break, {act} (decorative)","officeInspectorTired":" · Quota is low or blocked, so this character looks tired.","officeCountOnline":"{working} working · {total} here","officeCountOffline":"{total} accounts · disconnected","officeCountEmpty":"No accounts yet","officeBusyTicker":"Everyone is busy at their desks right now.","officeSpotTakenTicker":"That spot is already taken. Try again in a moment.","officeAgentLabel":"Agent {index}, {label}, {state}","officeResumeToUse":"Resume motion to use","officeActs":{"coffee":"getting coffee","arcade":"playing the arcade cabinet","vending":"at the vending machine","water":"at the water cooler","couch":"relaxing on the sofa","read":"browsing the bookcase","plant":"watering the plants","stroll":"stretching their legs","desk":"taking a moment at the desk","visit":"checking on a colleague","chat":"chatting","pong":"playing ping-pong","wandering":"wandering"},"officeZones":{"coffee":{"label":"Coffee machine","hint":"Click to send someone for coffee"},"arcade":{"label":"Arcade cabinet","hint":"Click to send someone to play"},"vending":{"label":"Vending machine","hint":"Click to send someone for a snack"},"water":{"label":"Water cooler","hint":"Click to send someone for a drink"},"couch":{"label":"Sofa","hint":"Click to send someone to relax"},"read":{"label":"Bookcase","hint":"Click to send someone to read"},"pong":{"label":"Ping-pong table","hint":"Click to start a match"}},"accountsTitle":"Accounts","refreshQuotasBtn":"Refresh quotas","addAccountBtn":"Add account","cancelLoginBtn":"Cancel account login","useBtn":"Use","manageAria":"Manage {label}","renameBtn":"Rename","removeBtn":"Remove","promptRename":"Account label","confirmRemove":"Remove {label} and its saved pool credential? You can add it again by signing in.","badgeRouting":"Routing","badgeStale":"Stale","badgeBlocked":"Quota blocked","badgeRemoving":"Removing…","resetUnavailable":"Reset time unavailable","resetDue":"Reset due · awaiting refresh","resetsIn":"Resets in {time}","resetsAt":"Resets {time}","quotaUnavailable":"quota unavailable","remainingAria":"{label}: {val}% remaining","quotaCheckUnavailable":"Quota check unavailable","waitingQuotaReadings":"Waiting for quota readings","lastCheckedAt":"Last checked {time}","checkedAt":"Checked {time}","blockedUntilAt":"Blocked until {time}","quotaWarningSingular":"1 account quota check unavailable. Quota error retry remains active.","quotaWarningPlural":"{count} account quota checks unavailable. Quota error retry remains active.","emptyAccounts":"Add your first account to get started.","openProjectTitle":"Open a project","projectFolderLabel":"Project folder","projectFolderPlaceholder":"C:\\path\\to\\project","continueConversation":"Continue latest conversation","openProjectBtn":"Open project in Antigravity CLI","pinFolderBtn":"Pin this folder","projectHint":"Account switches keep the model and CLI session across prompts.","autoApproveTitle":"Automatic tool approvals","autoApproveSafeBadge":"Disabled","autoApproveActiveBadge":"Enabled","autoApproveEnableBtn":"Enable","autoApproveDisableBtn":"Disable","autoApproveSafeDesc":"Safe mode: CLI asks for approval before executing tools that require authorization. Applies to new sessions.","autoApproveActiveDesc":"Automatic mode: CLI starts with --dangerously-skip-permissions, skipping tool confirmations. Applies to new sessions.","lastRequestedModelLabel":"Last requested model","noProjectPromptYet":"No project prompt yet","geminiPoolLabel":"Gemini quota pool","otherPoolLabel":"Claude / GPT quota pool","pinnedProjectsLabel":"Pinned & recent projects","launchBtn":"Launch","pinBtn":"Pin","unpinBtn":"Unpin","forgetBtn":"Forget","forgetTitle":"Remove from this list; project files are kept","emptyProjectsHint":"Launch a project to remember it here, or pin a folder above. Saved in this browser.","storageUnavailableNotice":"Browser storage is unavailable. Project choices will last only for this page.","activityTitle":"Activity","activityFilterAria":"Activity filter","filterAll":"All activity","filterSwitch":"Account switches","filterQuota":"Quota events","badgeSwitch":"Account switch","badgeQuota":"Quota","badgeProject":"Project","badgeAccount":"Account","badgeSystem":"Maintenance","noActivityYet":"No matching activity yet.","advancedTitle":"Advanced settings & diagnostics","earlySwitchingTitle":"Early switching","switchAtLabel":"Switch at","percentRemaining":"% remaining","saveBtn":"Save","earlySwitchingHint":"Checked for the model used by each request. 0% disables early switching; quota error retries still work.","switchTestsTitle":"Switch tests","switchTestsHint":"After a project prompt, arm a test and send another small prompt in the same CLI. A test uses some quota from the next account.","testLowBtn":"Test low quota switch","testRetryBtn":"Test quota error retry","accountHealthTitle":"Account health","accountHealthHint":"Renew the access token for the account serving the last requested model.","checkTokenRenewalBtn":"Check token renewal","stopPoolTitle":"Stop the pool","stopPoolHint":"Open CLI sessions need the pool to send requests. Finish your tasks before stopping it. Use the Desktop shortcut to start again.","stopAppBtn":"Stop app","confirmStop":"Stop the pool? Open CLI sessions cannot send requests until it starts again.","footerNote":"Quota figures show remaining capacity. Refreshes every minute. Hover a reset countdown for its exact time.","msgEnterProjectFolder":"Enter a project folder first.","msgProjectPinned":"Project pinned.","msgAutoApproveEnabled":"Automatic tool approvals enabled.","msgAutoApproveDisabled":"Automatic tool approvals disabled (safe mode).","msgProjectOpening":"Project CLI is opening.","msgProjectOpeningSafe":"Project CLI is opening in safe mode.","msgProjectOpeningAuto":"Project CLI is opening with automatic tool approvals.","msgSignInDifferentAccount":"Sign in with a different Google account in the new CLI window.","msgOriginalCredentialRestored":"Original credential restored.","msgQuotasRefreshed":"Refreshed both quota groups for all accounts.","msgTestRetryArmed":"Quota retry test armed. Send a small prompt in your project CLI.","msgTestLowArmed":"Early switch test armed. Send a small prompt in your project CLI.","msgThresholdSaved":"Switch threshold saved.","msgThresholdError":"Enter a whole percentage between 0 and 100.","msgTokenRenewed":"The routing account renewed its access token.","msgPoolStopped":"Pool stopped. Use the Desktop shortcut to start it again.","msgAccountSelected":"Selected {label}.","msgAccountRemoved":"Removed {label}."},
+  'pt-BR': {"appTitle":"Pool de contas","appSubtitle":"Antigravity CLI","themeLabel":"Tema","themeAria":"Tema do painel","langLabel":"Idioma","langAria":"Idioma da interface","themes":{"sage":"Sálvia","ocean":"Oceano","plum":"Ameixa","midnight":"Meia-noite","sand":"Areia","paper":"Papel"},"connectionState":{"connecting":"Conectando","running":"Conectado","reconnecting":"Reconectando","offline":"Indisponível","stopped":"Parado"},"connectionNotice":{"stopped":"O pool está parado. Dê um duplo clique no atalho da Área de Trabalho para iniciá-lo novamente.","offline":"Não foi possível conectar ao pool. Abra o atalho da Área de Trabalho se ele estiver parado. As leituras de cota abaixo estão desatualizadas; esta página reconectará automaticamente.","reconnecting":"Conexão interrompida. Tentando reconectar automaticamente; as leituras de cota abaixo estão desatualizadas."},"overviewAria":"Disponibilidade de cota","checking":"Verificando…","availableOverall":"disponível no geral","aggregateTooltip":"Média da menor cota restante (5 horas ou semanal) de cada conta; contas bloqueadas contam como zero","fiveHours":"5 horas","weekly":"Semanal","checkingQuotas":"Verificando cotas…","limitsSummary":"Limites de 5 horas e semanais","tokenNote":"Total exato de tokens indisponível nas leituras de cota.","reportingCount":"{complete} / {total} informando","accountsReady":"{ready} de {total} contas prontas","readingsStale":"Leituras desatualizadas","summaryStatus":"{low} baixas ou bloqueadas · {unknown} não confirmadas","tokenCountNote":"Total de tokens indisponível. As cotas são informadas como porcentagens entre {total} contas.","chartAria":"Cota {group}: média restante em 5 horas {five}; média restante semanal {week}; utilizável no geral {usable}; {complete} de {total} contas totalmente confirmadas.","chartImgAria":{"gemini":"Gráfico de cota Gemini","other":"Gráfico de cota Claude e GPT"},"officeTitle":"O escritório","officeWaiting":"Aguardando contas","officeSubtitle":"Uma mesa para cada conta. Uma sala compartilhada.","officeToolsAria":"Atividades de pausa (decorativas)","officeFun":{"coffee":"Café","coffeeTitle":"Enviar alguém para pegar café","pong":"Pingue-pongue","pongTitle":"Iniciar uma partida de pingue-pongue","arcade":"Fliperama","arcadeTitle":"Enviar alguém para o fliperama","chat":"Conversa","chatTitle":"Iniciar conversa entre dois personagens"},"officeChatOn":"Conversa: ligada","officeChatOff":"Conversa: desligada","officeChatTitle":"Exibir ou ocultar balões de fala","officeMotionPause":"Pausar animação","officeMotionResume":"Retomar animação","officeMotionReduced":"Animação reduzida","officeMotionTitle":"Pausar movimentos decorativos. A atividade ao vivo continua atualizando.","officeMotionReducedTitle":"Segue a preferência de redução de movimento do seu sistema","officeEmptyTitle":"Seu escritório está vazio","officeEmptyDesc":"Adicione uma conta abaixo para dar uma mesa ao seu primeiro agente.","officeCanvasAria":"Um escritório em pixel art compartilhado para suas contas","officeCanvasAriaDynamic":"Escritório compartilhado com {total} personagens de conta; {working} atendendo requisições de modelos no momento. Conversas e jogos de pausa são decorativos. Use os botões de conta abaixo para inspecionar cada personagem.","officeLegendLive":"Requisição ativa","officeLegendIdle":"Ocioso","officeLegendDesc":"Movimentos ociosos, conversas e jogos são decorativos. Selecione um personagem para inspecionar sua atividade.","officeRosterAria":"Personagens das contas","officeInspectorSelect":"Selecione um personagem ou uma conta acima.","officeInspectorTyping":"A digitação acompanha as requisições ativas no seu CLI. Atividades de pausa são decorativas.","officeClearSelection":"Limpar seleção","officeStateWorkingRequests":"Trabalhando · {count} requisições","officeStateWorking":"Trabalhando","officeStateRecent":"Ativo recentemente","officeStateOffline":"Indisponível","officeStateIdle":"Ocioso","officeInspectorOffline":"O pool está indisponível. A atividade reconectará com o painel.","officeInspectorCurrentModel":"Modelo atual: ","officeInspectorLastModel":"Último modelo: ","officeInspectorLastActive":" · Última atividade às {time}","officeInspectorNoModel":"Nenhuma requisição de modelo observada para esta conta ainda.","officeInspectorBreak":" · Em pausa, {act} (decorativo)","officeInspectorTired":" · A cota está baixa ou bloqueada, por isso o personagem parece cansado.","officeCountOnline":"{working} trabalhando · {total} aqui","officeCountOffline":"{total} contas · desconectado","officeCountEmpty":"Nenhuma conta ainda","officeBusyTicker":"Todos estão ocupados em suas mesas no momento.","officeSpotTakenTicker":"Esse lugar já está ocupado. Tente novamente em um instante.","officeAgentLabel":"Agente {index}, {label}, {state}","officeResumeToUse":"Retome a animação para usar","officeActs":{"coffee":"pegando café","arcade":"jogando no fliperama","vending":"na máquina de lanches","water":"no bebedouro","couch":"relaxando no sofá","read":"olhando a estante","plant":"regando as plantas","stroll":"alongando as pernas","desk":"descansando na mesa","visit":"visitando um colega","chat":"conversando","pong":"jogando pingue-pongue","wandering":"passeando"},"officeZones":{"coffee":{"label":"Máquina de café","hint":"Clique para enviar alguém para pegar café"},"arcade":{"label":"Fliperama","hint":"Clique para enviar alguém para jogar"},"vending":{"label":"Máquina de lanches","hint":"Clique para enviar alguém para um lanche"},"water":{"label":"Bebedouro","hint":"Clique para enviar alguém para beber água"},"couch":{"label":"Sofá","hint":"Clique para enviar alguém para relaxar"},"read":{"label":"Estante de livros","hint":"Clique para enviar alguém para ler"},"pong":{"label":"Mesa de pingue-pongue","hint":"Clique para iniciar uma partida"}},"accountsTitle":"Contas","refreshQuotasBtn":"Atualizar cotas","addAccountBtn":"Adicionar conta","cancelLoginBtn":"Cancelar login da conta","useBtn":"Usar","manageAria":"Gerenciar {label}","renameBtn":"Renomear","removeBtn":"Remover","promptRename":"Nome da conta","confirmRemove":"Remover {label} e sua credencial salva no pool? Você pode adicioná-la novamente fazendo login.","badgeRouting":"Roteamento","badgeStale":"Desatualizado","badgeBlocked":"Cota bloqueada","badgeRemoving":"Removendo…","resetUnavailable":"Horário de redefinição indisponível","resetDue":"Redefinição pendente · aguardando atualização","resetsIn":"Redefine em {time}","resetsAt":"Redefine às {time}","quotaUnavailable":"cota indisponível","remainingAria":"{label}: {val}% restante","quotaCheckUnavailable":"Verificação de cota indisponível","waitingQuotaReadings":"Aguardando leituras de cota","lastCheckedAt":"Última verificação às {time}","checkedAt":"Verificado às {time}","blockedUntilAt":"Bloqueado até {time}","quotaWarningSingular":"1 verificação de cota de conta indisponível. A nova tentativa de erro de cota continua ativa.","quotaWarningPlural":"{count} verificações de cotas de contas indisponíveis. A nova tentativa de erro de cota continua ativa.","emptyAccounts":"Adicione sua primeira conta para começar.","openProjectTitle":"Abrir um projeto","projectFolderLabel":"Pasta do projeto","projectFolderPlaceholder":"C:\\caminho\\para\\o\\projeto","continueConversation":"Continuar conversa mais recente","openProjectBtn":"Abrir projeto no Antigravity CLI","pinFolderBtn":"Fixar esta pasta","projectHint":"A troca de contas mantém o modelo e a sessão do CLI entre os prompts.","autoApproveTitle":"Aprovação automática de ferramentas","autoApproveSafeBadge":"Desativado","autoApproveActiveBadge":"Ativado","autoApproveEnableBtn":"Ativar","autoApproveDisableBtn":"Desativar","autoApproveSafeDesc":"Modo seguro: o CLI solicita aprovação antes de executar ferramentas que exigem autorização. Aplica-se a novas sessões.","autoApproveActiveDesc":"Modo automático: o CLI inicia com --dangerously-skip-permissions, dispensando as confirmações de ferramentas. Aplica-se a novas sessões.","lastRequestedModelLabel":"Último modelo solicitado","noProjectPromptYet":"Nenhum prompt no projeto ainda","geminiPoolLabel":"Pool de cota Gemini","otherPoolLabel":"Pool de cota Claude / GPT","pinnedProjectsLabel":"Projetos fixados e recentes","launchBtn":"Iniciar","pinBtn":"Fixar","unpinBtn":"Desafixar","forgetBtn":"Remover","forgetTitle":"Remover desta lista; os arquivos do projeto são mantidos","emptyProjectsHint":"Inicie um projeto para salvá-lo aqui ou fixe uma pasta acima. Salvo neste navegador.","storageUnavailableNotice":"Armazenamento do navegador indisponível. As opções de projeto durarão apenas nesta página.","activityTitle":"Atividade","activityFilterAria":"Filtro de atividade","filterAll":"Todas as atividades","filterSwitch":"Trocas de conta","filterQuota":"Eventos de cota","badgeSwitch":"Troca de conta","badgeQuota":"Cota","badgeProject":"Projeto","badgeAccount":"Conta","badgeSystem":"Manutenção","noActivityYet":"Nenhuma atividade correspondente ainda.","advancedTitle":"Configurações avançadas e diagnósticos","earlySwitchingTitle":"Troca antecipada","switchAtLabel":"Trocar com","percentRemaining":"% restante","saveBtn":"Salvar","earlySwitchingHint":"Verificado para o modelo usado em cada requisição. 0% desativa a troca antecipada; tentativas após erro de cota continuam funcionando.","switchTestsTitle":"Testes de troca","switchTestsHint":"Após um prompt no projeto, arme um teste e envie outro prompt curto no mesmo CLI. O teste consumirá um pouco da cota da próxima conta.","testLowBtn":"Testar troca por cota baixa","testRetryBtn":"Testar repetição por erro de cota","accountHealthTitle":"Saúde da conta","accountHealthHint":"Renove o token de acesso da conta que atendeu ao último modelo solicitado.","checkTokenRenewalBtn":"Verificar renovação de token","stopPoolTitle":"Parar o pool","stopPoolHint":"Sessões abertas do CLI precisam do pool para enviar requisições. Conclua suas tarefas antes de pará-lo. Use o atalho da Área de Trabalho para iniciá-lo novamente.","stopAppBtn":"Parar aplicativo","confirmStop":"Parar o pool? Sessões abertas do CLI não poderão enviar requisições até que ele seja iniciado novamente.","footerNote":"Os valores de cota mostram a capacidade restante. Atualiza a cada minuto. Passe o mouse sobre a contagem regressiva para ver o horário exato.","msgEnterProjectFolder":"Informe uma pasta de projeto primeiro.","msgProjectPinned":"Projeto fixado.","msgAutoApproveEnabled":"Aprovações automáticas de ferramentas ativadas.","msgAutoApproveDisabled":"Aprovações manuais de ferramentas ativadas (modo seguro).","msgProjectOpening":"O CLI do projeto está abrindo.","msgProjectOpeningSafe":"O CLI do projeto está abrindo em modo seguro.","msgProjectOpeningAuto":"O CLI do projeto está abrindo com aprovação automática de ferramentas.","msgSignInDifferentAccount":"Faça login com uma conta Google diferente na nova janela do CLI.","msgOriginalCredentialRestored":"Credencial original restaurada.","msgQuotasRefreshed":"Ambos os grupos de cota foram atualizados para todas as contas.","msgTestRetryArmed":"Teste de repetição de cota armado. Envie um prompt curto no CLI do seu projeto.","msgTestLowArmed":"Teste de troca antecipada armado. Envie um prompt curto no CLI do seu projeto.","msgThresholdSaved":"Limite de troca salvo.","msgThresholdError":"Digite uma porcentagem inteira entre 0 e 100.","msgTokenRenewed":"A conta de roteamento renovou seu token de acesso.","msgPoolStopped":"Pool parado. Use o atalho da Área de Trabalho para iniciá-lo novamente.","msgAccountSelected":"Selecionado: {label}.","msgAccountRemoved":"Removido: {label}."}
+};
+const LANGUAGES = new Set(['en', 'pt-BR']);
+let currentLang = 'en';
+
+function t(key, vars) {
+  const lang = currentLang;
+  let str = I18N[lang]?.[key] ?? I18N['en']?.[key];
+  if (str == null) {
+    const parts = key.split('.');
+    let valLang = I18N[lang];
+    let valEn = I18N['en'];
+    for (const p of parts) {
+      valLang = valLang?.[p];
+      valEn = valEn?.[p];
+    }
+    str = valLang ?? valEn;
+  }
+  if (typeof str !== 'string') {
+    if (str != null) return str;
+    console.warn('[i18n] Missing translation for key "' + key + '" in "' + lang + '"');
+    return key;
+  }
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replaceAll('{' + k + '}', v);
+    }
+  }
+  return str;
+}
+
+function updateStaticI18n() {
+  document.documentElement.lang = currentLang;
+  for (const n of document.querySelectorAll('[data-i18n]')) n.textContent = t(n.dataset.i18n);
+  for (const n of document.querySelectorAll('[data-i18n-title]')) n.title = t(n.dataset.i18nTitle);
+  for (const n of document.querySelectorAll('[data-i18n-placeholder]')) n.placeholder = t(n.dataset.i18nPlaceholder);
+  for (const n of document.querySelectorAll('[data-i18n-aria]')) n.setAttribute('aria-label', t(n.dataset.i18nAria));
+  if ($('lang')) $('lang').value = currentLang;
+}
+
+function applyLanguage(value, persist = false) {
+  const lang = LANGUAGES.has(value) ? value : 'en';
+  currentLang = lang;
+  updateStaticI18n();
+  if (persist) {
+    try { localStorage.setItem(LANG_STORAGE, lang); }
+    catch { storageUnavailable(); }
+  }
+  accountStamp = ''; projectStamp = ''; eventStamp = ''; workspaceStamp = '';
+  if (current) render(current);
+  else controls();
+  renderProjects();
+  renderEvents();
+  updateOfficeMotion();
+  updateOfficeInspector();
+}
+
+function loadLanguage() {
+  try { applyLanguage(localStorage.getItem(LANG_STORAGE) || 'en'); }
+  catch { applyLanguage('en'); }
+}
+
+function translateEvent(msg) {
+  if (currentLang !== 'pt-BR' || !msg) return msg;
+  let m;
+  if (/^Saved the currently signed-in account in Windows Credential Manager\.$/.test(msg))
+    return 'Conta atualmente conectada salva no Gerenciador de Credenciais do Windows.';
+  if ((m = msg.match(/^Added (.*) and restored the original CLI credential\.$/)))
+    return 'Adicionado ' + m[1] + ' e restaurada a credencial original do CLI.';
+  if ((m = msg.match(/^Selected (.*) for future requests\.$/)))
+    return 'Selecionado ' + m[1] + ' para futuras requisições.';
+  if ((m = msg.match(/^Removed (.*) from the account pool\.$/)))
+    return 'Removido ' + m[1] + ' do pool de contas.';
+  if ((m = msg.match(/^Now routing (.*) requests through (.*)\.$/)))
+    return 'Roteando requisições de ' + m[1] + ' agora através de ' + m[2] + '.';
+  if ((m = msg.match(/^Switched (.*) before a request: selected account was at (\d+)% \(threshold (\d+)%\)\.$/)))
+    return 'Trocou ' + m[1] + ' antes de uma requisição: a conta selecionada estava em ' + m[2] + '% (limite ' + m[3] + '%).';
+  if ((m = msg.match(/^(.*) reached its (.*) quota; retrying with the next account\.$/)))
+    return m[1] + ' atingiu sua cota de ' + m[2] + '; tentando com a próxima conta.';
+  if ((m = msg.match(/^(.*) reached its (.*) quota; no other account is available\.$/)))
+    return m[1] + ' atingiu sua cota de ' + m[2] + '; nenhuma outra conta disponível.';
+  if ((m = msg.match(/^Refreshed access token for (.*)\.$/)))
+    return 'Token de acesso renovado para ' + m[1] + '.';
+  if ((m = msg.match(/^Opened Antigravity CLI for (.*) \(process (\d+)\)\.$/)))
+    return 'Antigravity CLI aberto para ' + m[1] + ' (processo ' + m[2] + ').';
+  if ((m = msg.match(/^Opened Antigravity CLI for a new account \(process (\d+)\)\.$/)))
+    return 'Antigravity CLI aberto para nova conta (processo ' + m[1] + ').';
+  if (/^Account login timed out; original CLI credential restored\.$/.test(msg))
+    return 'Tempo de login da conta esgotado; credencial original do CLI restaurada.';
+  if (/^Account login canceled; original CLI credential restored\.$/.test(msg))
+    return 'Login da conta cancelado; credencial original do CLI restaurada.';
+  if ((m = msg.match(/^Low quota switch threshold set to (\d+)%\.$/)))
+    return 'Limite de troca por cota baixa definido para ' + m[1] + '%.';
+  if (/^Recovered the original Antigravity credential after an interrupted account login\.$/.test(msg))
+    return 'Credencial original do Antigravity recuperada após login interrompido.';
+  if (/^Stopped account enrollment; original credential restored\.$/.test(msg))
+    return 'Cadastro de conta interrompido; credencial original restaurada.';
+  if ((m = msg.match(/^The next (.*) request will receive a local quota error, then retry through another account\.$/)))
+    return 'A próxima requisição ' + m[1] + ' receberá um erro local de cota e tentará outra conta.';
+  if (/^The next (.*) request will test a low quota reading, then route through another account\.$/.test(msg))
+    return 'A próxima requisição ' + RegExp.$1 + ' testará leitura de cota baixa e trocará de conta.';
+  if (/^Automatic tool approvals enabled\.$/.test(msg))
+    return 'Aprovações automáticas de ferramentas ativadas.';
+  if (/^Automatic tool approvals disabled \(safe mode\)\.$/.test(msg))
+    return 'Aprovações manuais de ferramentas ativadas (modo seguro).';
+  return msg;
+}
+
 const THEMES = new Set(['sage','ocean','plum','midnight','sand','paper']);
 let current = null, busy = false, connected = false, failures = 0, stopped = false, refreshPending = false;
 let accountStamp = '', projectStamp = '', eventStamp = '', workspaceStamp = '';
@@ -311,35 +437,35 @@ function rememberProject(path,pin=false){
 }
 function message(text,error=false){$('message').hidden=!text;$('message').textContent=text;$('message').classList.toggle('error',error);}
 function connection(state){
- connected=state==='running';$('connection').dataset.state=state;$('connectionText').textContent={running:'Connected',reconnecting:'Reconnecting',offline:'Unavailable',stopped:'Stopped',connecting:'Connecting'}[state];
+ connected=state==='running';$('connection').dataset.state=state;$('connectionText').textContent=t('connectionState.'+state);
  $('connectionNotice').hidden=connected||state==='connecting';
- $('connectionNotice').textContent=state==='stopped'?'The pool is stopped. Double-click the Desktop shortcut to start it again.':state==='offline'?'Cannot reach the pool. Open the Desktop shortcut if it is stopped. Quota readings below are stale; this page will reconnect automatically.':'Connection interrupted. Retrying automatically; quota readings below are stale.';
+ $('connectionNotice').textContent=t('connectionNotice.'+state);
  if(current)render(current);else controls();
 }
 function isStale(a){return !connected||!a.quotaCheckedAt||Date.now()-a.quotaCheckedAt>STALE_MS;}
 function countdown(value){
- const ms=Date.parse(value)-Date.now();if(!Number.isFinite(ms))return 'Reset time unavailable';if(ms<=0)return 'Reset due · awaiting refresh';
- const m=Math.ceil(ms/60000),h=Math.floor(m/60),d=Math.floor(h/24);return 'Resets in '+(d?d+'d '+h%24+'h':h?h+'h '+m%60+'m':m+'m');
+ const ms=Date.parse(value)-Date.now();if(!Number.isFinite(ms))return t('resetUnavailable');if(ms<=0)return t('resetDue');
+ const m=Math.ceil(ms/60000),h=Math.floor(m/60),d=Math.floor(h/24);return t('resetsIn',{time:(d?d+'d '+h%24+'h':h?h+'h '+m%60+'m':m+'m')});
 }
 function quotaMeter(label,reading,color,threshold){
  const meter=el('div','quota-meter'),track=el('div','quota-track'),fill=el('span','quota-fill'),v=reading?.percent,p=v==null||!Number.isFinite(Number(v))?null:Math.max(0,Math.min(100,Number(v)));
  if(p!=null){fill.style.width=p+'%';fill.style.background=p<=threshold?'var(--danger)':color;}
- track.setAttribute('role','img');track.setAttribute('aria-label',label+': '+(p==null?'quota unavailable':p+'% remaining'));track.append(fill);
- const reset=el('div','reset',countdown(reading?.resetTime));if(reading?.resetTime){reset.dataset.reset=reading.resetTime;reset.title='Resets '+new Date(reading.resetTime).toLocaleString();}
+ track.setAttribute('role','img');track.setAttribute('aria-label',p==null?label+': '+t('quotaUnavailable'):t('remainingAria',{label,val:p}));track.append(fill);
+ const reset=el('div','reset',countdown(reading?.resetTime));if(reading?.resetTime){reset.dataset.reset=reading.resetTime;reset.title=t('resetsAt',{time:new Date(reading.resetTime).toLocaleString(currentLang==='pt-BR'?'pt-BR':'en-US')});}
  meter.append(el('div','meter-label',label),el('strong','quota-value',p==null?'—':p+'%'),track,reset);return meter;
 }
 function quotaGroup(a,s,k,title,color){
  const stale=isStale(a),g=el('div','quota-group '+k+(stale?' stale':'')),heading=el('div','quota-title'),blocked=Math.max(a.blockedGroups?.[k]||0,a.blockedUntil||0);
- heading.append(el('span','',title));if(stale)heading.append(el('span','badge blocked','Stale'));else if(blocked>Date.now())heading.append(el('span','badge blocked','Quota blocked'));else if(s.activeGroups?.[k]===a.id)heading.append(el('span','badge','Routing'));
- const meters=el('div','quota-meters'),pool=a.quotaPools?.[k]||{};meters.append(quotaMeter('5 hours',pool.fiveHour,color,s.lowQuotaPercent),quotaMeter('Weekly',pool.weekly,color,s.lowQuotaPercent));
- const foot=el('div','quota-foot');foot.textContent=a.quotaError?'Quota check unavailable':stale?(a.quotaCheckedAt?'Last checked '+new Date(a.quotaCheckedAt).toLocaleTimeString():'Waiting for quota readings'):blocked>Date.now()?'Blocked until '+new Date(blocked).toLocaleString():'Checked '+new Date(a.quotaCheckedAt).toLocaleTimeString();
+ heading.append(el('span','',title));if(stale)heading.append(el('span','badge blocked',t('badgeStale')));else if(blocked>Date.now())heading.append(el('span','badge blocked',t('badgeBlocked')));else if(s.activeGroups?.[k]===a.id)heading.append(el('span','badge',t('badgeRouting')));
+ const meters=el('div','quota-meters'),pool=a.quotaPools?.[k]||{};meters.append(quotaMeter(t('fiveHours'),pool.fiveHour,color,s.lowQuotaPercent),quotaMeter(t('weekly'),pool.weekly,color,s.lowQuotaPercent));
+ const foot=el('div','quota-foot');const dl=currentLang==='pt-BR'?'pt-BR':'en-US';foot.textContent=a.quotaError?t('quotaCheckUnavailable'):stale?(a.quotaCheckedAt?t('lastCheckedAt',{time:new Date(a.quotaCheckedAt).toLocaleTimeString(dl)}):t('waitingQuotaReadings')):blocked>Date.now()?t('blockedUntilAt',{time:new Date(blocked).toLocaleString(dl)}):t('checkedAt',{time:new Date(a.quotaCheckedAt).toLocaleTimeString(dl)});
  g.append(heading,meters,foot);return g;
 }
 function validPercent(reading){
  const value=reading?.percent;
  return value!=null&&Number.isFinite(Number(value))&&Number(value)>=0&&Number(value)<=100?Number(value):null;
 }
-const formatPercent=value=>new Intl.NumberFormat(undefined,{maximumFractionDigits:1}).format(value)+'%';
+const formatPercent=value=>new Intl.NumberFormat(currentLang==='pt-BR'?'pt-BR':'en-US',{maximumFractionDigits:1}).format(value)+'%';
 function summary(s,k){
  const total=s.accounts.length,windows={fiveHour:{sum:0,known:0},weekly:{sum:0,known:0}};
  let ready=0,low=0,unknown=0,usablePoints=0;
@@ -359,12 +485,13 @@ function summary(s,k){
   chart.style.setProperty(fill,(mean==null?0:mean)+'%');
   $(k+label).textContent=mean==null?'—':formatPercent(mean);
  }
- $(k+'Coverage').textContent=complete+' / '+total+' reporting';
+ $(k+'Coverage').textContent=t('reportingCount',{complete,total});
  $(k+'Effective').textContent=complete?formatPercent(usablePoints/complete):'—';
- chart.setAttribute('aria-label',(k==='gemini'?'Gemini':'Claude and GPT')+' quota: 5-hour '+(windows.fiveHour.known?formatPercent(windows.fiveHour.sum/windows.fiveHour.known):'unknown')+' average remaining; weekly '+(windows.weekly.known?formatPercent(windows.weekly.sum/windows.weekly.known):'unknown')+' average remaining; usable overall '+(complete?formatPercent(usablePoints/complete):'unknown')+'; '+complete+' of '+total+' accounts fully confirmed.');
- $(k+'Available').textContent=connected?ready+' of '+total+' accounts ready':'Readings are stale';
- $(k+'Summary').textContent=low+' low or blocked · '+unknown+' unconfirmed';
- $(k+'Tokens').textContent='Token total unavailable. Quotas are reported as percentages across '+total+' accounts.';
+ const groupLabel=k==='gemini'?'Gemini':'Claude / GPT';
+ chart.setAttribute('aria-label',t('chartAria',{group:groupLabel,five:windows.fiveHour.known?formatPercent(windows.fiveHour.sum/windows.fiveHour.known):'—',week:windows.weekly.known?formatPercent(windows.weekly.sum/windows.weekly.known):'—',usable:complete?formatPercent(usablePoints/complete):'—',complete,total}));
+ $(k+'Available').textContent=connected?t('accountsReady',{ready,total}):t('readingsStale');
+ $(k+'Summary').textContent=t('summaryStatus',{low,unknown});
+ $(k+'Tokens').textContent=t('tokenCountNote',{total});
 }
 // Original canvas artwork. This view consumes status only; selecting a character never changes routing.
 // Chat, coffee, games and other break-time play are purely decorative. Only a real in-flight request produces "Working".
@@ -374,14 +501,32 @@ try{officePaused=localStorage.getItem(OFFICE_MOTION_STORAGE)==='paused';officeCh
 const officeHash=id=>{let h=2166136261;for(const c of String(id)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 const officeRnd=(a,b)=>a+Math.random()*(b-a),officePick=list=>list[Math.floor(Math.random()*list.length)];
 const officeFx=[],officeSpots=new Map(),officeGroups=new Set(),officeMachines={coffee:{mode:'idle',t0:0,owner:null},arcade:{mode:'idle',t0:0,owner:null},vending:{mode:'idle',t0:0,owner:null}};
-const OFFICE_CHAT=[
+const OFFICE_CHAT_EN = [
  ['Is it Friday yet?','Ask the calendar.','Rude.'],['Coffee or tea?','Coffee. Always.','Same.'],['My context is full','Take a nap?','Good idea.'],
  ['Heard a rumor...','Tell me!','The sofa is soft'],['Which model today?','Whatever they send','Fair enough.'],['Nice desk plant','Her name is Fern','Of course.'],
  ['Ping-pong later?','You are on!','I will win.'],['Is this a bug?','It is a feature','Ship it!'],['Tabs or spaces?','Spaces. Always.','We are done.'],
  ['Love this rug','It ties the room','Nice one.'],['Lunch ideas?','Pixel pizza','Obviously.'],['Rubber duck, anyone?','Quack.','That helped.'],
  ['Did you hear that?','It was the fridge','Always is.'],['Any good podcasts?','Only about caching','Ha!'],['Long day?','Feels like a week','Hang in there.']];
-const OFFICE_MUTTER=['Hmm...','La la la','Almost lunch?','Nice day.','*yawn*','Where was I?'],OFFICE_VISIT=['Need a hand?','Looking busy!','How is it going?','Coffee?'],OFFICE_HELLO=['Hi there!','Hello!','Oh, hi!','Boop!','Need me?','Good day!'];
-const OFFICE_START=['On it!','Here we go!','Request in!','Let me see...'],OFFICE_DONE=['Done!','All set!','Ta-da!','Nailed it!'],OFFICE_CHEER=['Nice!','Bravo!','Go go!','Well done!'],OFFICE_TIRED=['So sleepy...','Low on juice','Need coffee...','Running on fumes'];
+const OFFICE_CHAT_PT = [
+ ['Já é sexta-feira?','Pergunta pro calendário.','Grosseria.'],['Café ou chá?','Café. Sempre.','Idem.'],['Meu contexto tá cheio','Tirar um cochilo?','Boa ideia.'],
+ ['Ouvi um boato...','Conta aí!','O sofá é macio'],['Qual modelo hoje?','O que mandarem','Justo.'],['Bela plantinha','O nome dela é Samambaia','Com certeza.'],
+ ['Pingue-pongue depois?','Demorou!','Eu vou ganhar.'],['Isso é um bug?','É uma funcionalidade','Manda pra produção!'],['Tabs ou espaços?','Espaços. Sempre.','Acabou a amizade.'],
+ ['Curti esse tapete','Combina com a sala','Ficou top.'],['Ideias pro almoço?','Pizza em pixel','Com certeza.'],['Pato de borracha, alguém?','Quack.','Ajudou muito.'],
+ ['Você ouviu isso?','Foi a geladeira','Sempre ela.'],['Algum podcast bom?','Só sobre cache','Haha!'],['Dia longo?','Parece uma semana','Força aí!']];
+const OFFICE_MUTTER_EN=['Hmm...','La la la','Almost lunch?','Nice day.','*yawn*','Where was I?'],OFFICE_VISIT_EN=['Need a hand?','Looking busy!','How is it going?','Coffee?'],OFFICE_HELLO_EN=['Hi there!','Hello!','Oh, hi!','Boop!','Need me?','Good day!'];
+const OFFICE_MUTTER_PT=['Hmm...','Lá lá lá','Quase hora do almoço?','Belo dia.','*bocejo*','Onde eu estava?'],OFFICE_VISIT_PT=['Precisa de ajuda?','Parece ocupado!','Como estão as coisas?','Café?'],OFFICE_HELLO_PT=['Olá!','Oi!','Opa, oi!','Beep boop!','Precisa de mim?','Bom dia!'];
+const OFFICE_START_EN=['On it!','Here we go!','Request in!','Let me see...'],OFFICE_DONE_EN=['Done!','All set!','Ta-da!','Nailed it!'],OFFICE_CHEER_EN=['Nice!','Bravo!','Go go!','Well done!'],OFFICE_TIRED_EN=['So sleepy...','Low on juice','Need coffee...','Running on fumes'];
+const OFFICE_START_PT=['Mãos à obra!','Lá vamos nós!','Requisição recebida!','Deixa comigo...'],OFFICE_DONE_PT=['Pronto!','Tudo certo!','Tcharam!','Perfeito!'],OFFICE_CHEER_PT=['Boa!','Bravo!','Vai que vai!','Mandou bem!'],OFFICE_TIRED_PT=['Que sono...','Na reserva','Preciso de café...','Só o pó da rabiola'];
+
+const officeChatList=()=>currentLang==='pt-BR'?OFFICE_CHAT_PT:OFFICE_CHAT_EN;
+const officeMutterList=()=>currentLang==='pt-BR'?OFFICE_MUTTER_PT:OFFICE_MUTTER_EN;
+const officeVisitList=()=>currentLang==='pt-BR'?OFFICE_VISIT_PT:OFFICE_VISIT_EN;
+const officeHelloList=()=>currentLang==='pt-BR'?OFFICE_HELLO_PT:OFFICE_HELLO_EN;
+const officeStartList=()=>currentLang==='pt-BR'?OFFICE_START_PT:OFFICE_START_EN;
+const officeDoneList=()=>currentLang==='pt-BR'?OFFICE_DONE_PT:OFFICE_DONE_EN;
+const officeCheerList=()=>currentLang==='pt-BR'?OFFICE_CHEER_PT:OFFICE_CHEER_EN;
+const officeTiredList=()=>currentLang==='pt-BR'?OFFICE_TIRED_PT:OFFICE_TIRED_EN;
+
 const OFFICE_ACT_LABEL={coffee:'getting coffee',arcade:'playing the arcade cabinet',vending:'at the vending machine',water:'at the water cooler',couch:'relaxing on the sofa',read:'browsing the bookcase',plant:'watering the plants',stroll:'stretching their legs',desk:'taking a moment at the desk',visit:'checking on a colleague',chat:'chatting',pong:'playing ping-pong'};
 const OFFICE_EMOTES={
  heart:{color:'#cf7f93',rows:['.XX.XX.','XXXXXXX','XXXXXXX','.XXXXX.','..XXX..','...X...']},
@@ -396,7 +541,7 @@ function officeTicker(text){const n=$('workspaceChatter');if(n)n.textContent=tex
 function officeSay(ui,text,dur=2.6,emote=null,delay=0){
  if(!officeMoving||!ui)return;if(!officeChatOn)text=null;if(!text&&!emote)return;
  ui.say={text,emote,from:officeClock+delay,until:officeClock+delay+dur};
- if(text&&!delay)officeTicker('Agent '+String(ui.index+1).padStart(2,'0')+' · “'+text+'”');
+ if(text&&!delay)officeTicker((currentLang==='pt-BR'?'Agente ':'Agent ')+String(ui.index+1).padStart(2,'0')+' · “'+text+'”');
 }
 function officeBurst(x,y,kind,count){
  if(!officeMoving)return;const colors=kind==='confetti'?['#d98b7a','#e3c46f','#a6d6a0','#8fb4d6','#c98aa6']:['#f0e4b0','#fff6d0','#e3c46f'];
@@ -408,7 +553,7 @@ function officeAppearance(id){
  const h=officeHash(id);return {shirt:accountColor(id),skin:['#dcb49a','#bb8c70','#8f634f','#e5c2a3','#c9987c'][Math.floor(h/8)%5],hair:['#3d3038','#6c493c','#a47b4d','#302d36','#655465'][Math.floor(h/40)%5],style:Math.floor(h/200)%6,pants:['#465263','#53535e','#596251','#62505d'][Math.floor(h/1200)%4],glasses:Math.floor(h/4800)%4===0};
 }
 function officeState(work){return !connected?'offline':work?.inFlight>0?'working':work?.lastFinishedAt&&Date.now()-work.lastFinishedAt<10000?'recent':'idle';}
-function officeStateLabel(ui){return ui.activity==='working'?(ui.work.inFlight>1?'Working · '+ui.work.inFlight+' requests':'Working'):({recent:'Recently active',offline:'Unavailable',idle:'Idle'})[ui.activity];}
+function officeStateLabel(ui){return ui.activity==='working'?(ui.work.inFlight>1?t('officeStateWorkingRequests',{count:ui.work.inFlight}):t('officeStateWorking')):({recent:t('officeStateRecent'),offline:t('officeStateOffline'),idle:t('officeStateIdle')})[ui.activity];}
 function officeTired(a,s){
  if(isStale(a)||a.quotaError)return false;const now=Date.now(),low=s.lowQuotaPercent;
  if(Math.max(a.blockedUntil||0,a.blockedGroups?.gemini||0,a.blockedGroups?.other||0)>now)return true;
@@ -416,10 +561,10 @@ function officeTired(a,s){
 }
 function officeReact(ui,prev){
  if(!officeMoving||!ui.station||prev==='offline'||ui.activity==='offline')return;
- if(ui.activity==='working'&&prev!=='working')officeSay(ui,officePick(OFFICE_START),2.2);
+ if(ui.activity==='working'&&prev!=='working')officeSay(ui,officePick(officeStartList()),2.2);
  if(prev==='working'&&ui.activity!=='working'){
-  officeSay(ui,officePick(OFFICE_DONE),2.6,'star');ui.cheerUntil=officeClock+1.8;officeBurst(ui.station.x,ui.station.y+6,'confetti',16);
-  let fans=0;for(const o of officeCards.values())if(o!==ui&&fans<2&&officeFree(o)&&Math.random()<.7){fans++;officeSay(o,officePick(OFFICE_CHEER),2,'heart',.5+fans*.5);o.cheerUntil=officeClock+2+fans*.5;}
+  officeSay(ui,officePick(officeDoneList()),2.6,'star');ui.cheerUntil=officeClock+1.8;officeBurst(ui.station.x,ui.station.y+6,'confetti',16);
+  let fans=0;for(const o of officeCards.values())if(o!==ui&&fans<2&&officeFree(o)&&Math.random()<.7){fans++;officeSay(o,officePick(officeCheerList()),2,'heart',.5+fans*.5);o.cheerUntil=officeClock+2+fans*.5;}
  }
 }
 function renderWorkspace(s){
@@ -458,19 +603,20 @@ function renderWorkspace(s){
 function selectOfficeAgent(id){officeSelection=officeSelection===id?null:id;for(const ui of officeCards.values())ui.person.setAttribute('aria-pressed',String(officeSelection===ui.id));updateOfficeInspector();}
 function updateOfficeInspector(){
  const ui=officeCards.get(officeSelection);$('workspaceClear').hidden=!ui;
- if(!ui){$('workspaceInspectorLine').textContent='Select a character or an account above.';$('workspaceInspectorModel').textContent='Typing follows live model requests in your CLI. Break-time play is decorative.';return;}
- const label=el('strong','',ui.label),number=el('span','workspace-index','Agent '+String(ui.index+1).padStart(2,'0')),state=el('span','workspace-inspector-state',officeStateLabel(ui));
+ if(!ui){$('workspaceInspectorLine').textContent=t('officeInspectorSelect');$('workspaceInspectorModel').textContent=t('officeInspectorTyping');return;}
+ const label=el('strong','',ui.label),number=el('span','workspace-index',(currentLang==='pt-BR'?'Agente ':'Agent ')+String(ui.index+1).padStart(2,'0')),state=el('span','workspace-inspector-state',officeStateLabel(ui));
  $('workspaceInspectorLine').replaceChildren(number,label,state);
  const model=ui.work.lastModel,finished=ui.work.lastFinishedAt;
- let text=ui.activity==='offline'?'The pool is unavailable. Activity will reconnect with the dashboard.':model?(ui.activity==='working'?'Current model: ':'Last model: ')+model+(ui.activity!=='working'&&finished?' · Last active '+new Date(finished).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''):'No model request observed for this account yet.';
- if(ui.activity==='idle'&&ui.act)text+=' · On a break, '+(OFFICE_ACT_LABEL[ui.act.kind]||'wandering')+' (decorative)';
- if(ui.tired&&ui.activity!=='offline')text+=' · Quota is low or blocked, so this character looks tired.';
+ const dl=currentLang==='pt-BR'?'pt-BR':'en-US';
+ let text=ui.activity==='offline'?t('officeInspectorOffline'):model?(ui.activity==='working'?t('officeInspectorCurrentModel'):t('officeInspectorLastModel'))+model+(ui.activity!=='working'&&finished?t('officeInspectorLastActive',{time:new Date(finished).toLocaleTimeString(dl,{hour:'2-digit',minute:'2-digit'})}):''):t('officeInspectorNoModel');
+ if(ui.activity==='idle'&&ui.act)text+=t('officeInspectorBreak',{act:t('officeActs.'+ui.act.kind)||t('officeActs.wandering')});
+ if(ui.tired&&ui.activity!=='offline')text+=t('officeInspectorTired');
  $('workspaceInspectorModel').textContent=text;
 }
 function updateOfficeMotion(){
- const b=$('workspaceMotion'),off=reducedMotion.matches;b.disabled=off;b.textContent=off?'Motion reduced':officePaused?'Resume motion':'Pause motion';b.setAttribute('aria-pressed',String(officePaused||off));b.title=off?'Follows your system’s reduced motion preference':'Pause decorative movement. Live activity still updates.';
+ const b=$('workspaceMotion'),off=reducedMotion.matches;b.disabled=off;b.textContent=off?t('officeMotionReduced'):officePaused?t('officeMotionResume'):t('officeMotionPause');b.setAttribute('aria-pressed',String(officePaused||off));b.title=off?t('officeMotionReducedTitle'):t('officeMotionTitle');
  const idle=officePaused||off||!connected||!officeCards.size;for(const f of document.querySelectorAll('[data-fun]'))f.disabled=idle;
- const chat=$('workspaceChat');chat.textContent=officeChatOn?'Chat: on':'Chat: off';chat.setAttribute('aria-pressed',String(officeChatOn));
+ const chat=$('workspaceChat');chat.textContent=officeChatOn?t('officeChatOn'):t('officeChatOff');chat.setAttribute('aria-pressed',String(officeChatOn));
 }
 $('workspaceMotion').onclick=()=>{officePaused=!officePaused;try{localStorage.setItem(OFFICE_MOTION_STORAGE,officePaused?'paused':'playing');}catch{}updateOfficeMotion();};
 $('workspaceChat').onclick=()=>{officeChatOn=!officeChatOn;try{localStorage.setItem(OFFICE_CHAT_STORAGE,officeChatOn?'on':'off');}catch{}if(!officeChatOn){officeTicker('');for(const ui of officeCards.values())if(ui.say)ui.say.text=null;}updateOfficeMotion();};
@@ -677,7 +823,7 @@ function officeStepAct(ui){
 }
 function officeMakeGroup(kind,members,spots){
  if(spots.some(s=>officeClaimed(s.id)))return false;
- const g={kind,members,spots,phase:'go',born:officeClock,li:0,next:0,u:0,dir:1,pause:0,score:[0,0],lines:kind==='chat'?officePick(OFFICE_CHAT):null};
+ const g={kind,members,spots,phase:'go',born:officeClock,li:0,next:0,u:0,dir:1,pause:0,score:[0,0],lines:kind==='chat'?officePick(officeChatList()):null};
  members.forEach((ui,i)=>{officeSpots.set(spots[i].id,ui.id);ui.act={kind,g,slot:i,spots:[spots[i].id],spot:spots[i],phase:'go'};ui.face=spots[i].dir;ui.pose=null;ui.prop=null;officeRoute(ui,spots[i],'away');});
  officeGroups.add(g);return true;
 }
@@ -703,8 +849,8 @@ function officePongTick(g,delta){
  g.u+=delta/.85;
  if(g.u>=1){
   g.u-=1;g.dir*=-1;
-  if(Math.random()<.35){const w=Math.random()<.5?0:1;g.score[w]++;g.pause=.9;g.u=0;officeSay(g.members[w],'Point!',1.3,null);
-   if(Math.max(...g.score)>=5||officeClock>g.until){g.phase='post';g.until=officeClock+2.8;const win=g.score[0]===g.score[1]?w:g.score[0]>g.score[1]?0:1;g.win=win;g.members[win].cheerUntil=g.until;officeSay(g.members[win],'GG!',2.4,'star');officeSay(g.members[1-win],'Rematch?',2.4,'sweat');officeBurst(g.members[win].position.x,g.members[win].position.y-30,'spark',8);}}
+  if(Math.random()<.35){const w=Math.random()<.5?0:1;g.score[w]++;g.pause=.9;g.u=0;officeSay(g.members[w],currentLang==='pt-BR'?'Ponto!':'Point!',1.3,null);
+   if(Math.max(...g.score)>=5||officeClock>g.until){g.phase='post';g.until=officeClock+2.8;const win=g.score[0]===g.score[1]?w:g.score[0]>g.score[1]?0:1;g.win=win;g.members[win].cheerUntil=g.until;officeSay(g.members[win],'GG!',2.4,'star');officeSay(g.members[1-win],currentLang==='pt-BR'?'Revanche?':'Rematch?',2.4,'sweat');officeBurst(g.members[win].position.x,g.members[win].position.y-30,'spark',8);}}
  }
 }
 function officeStartAct(ui,forced){
@@ -730,9 +876,9 @@ function officeStartAct(ui,forced){
 function officeSendTo(kind){
  if(!officeLayout||!officeMoving)return false;
  const free=[...officeCards.values()].filter(officeFree);
- if(free.length<(kind==='pong'||kind==='chat'?2:1)){officeTicker('Everyone is busy at their desks right now.');return false;}
+ if(free.length<(kind==='pong'||kind==='chat'?2:1)){officeTicker(t('officeBusyTicker'));return false;}
  const ui=officePick(free);if(officeStartAct(ui,kind))return true;
- officeTicker('That spot is already taken. Try again in a moment.');return false;
+ officeTicker(t('officeSpotTakenTicker'));return false;
 }
 function updateOfficeAgent(ui,time,delta,moving){
  const s=ui.station,desk={x:s.x,y:s.y+42},atDesk=ui.activity==='working'||ui.activity==='recent';
@@ -871,14 +1017,14 @@ function officeHit(event){
 }
 $('workspaceCanvas').onpointermove=event=>{
  const hit=officeHit(event),ui=hit?.agent,zone=hit?.zone,tooltip=$('workspaceTooltip');officeHover=ui?.id||null;officeHoverProp=zone?.kind||null;$('workspaceCanvas').style.cursor=hit?'pointer':'default';tooltip.hidden=!hit;
- if(hit){const bounds=$('workspaceStage').getBoundingClientRect();tooltip.textContent=ui?'Agent '+String(ui.index+1).padStart(2,'0')+' · '+ui.label+' · '+officeStateLabel(ui):zone.label+' · '+(officeMoving?zone.hint:'Resume motion to use');tooltip.style.left=Math.max(115,Math.min(bounds.width-115,event.clientX-bounds.left))+'px';tooltip.style.top=Math.max(35,event.clientY-bounds.top-12)+'px';}
+ if(hit){const bounds=$('workspaceStage').getBoundingClientRect();tooltip.textContent=ui?t('officeAgentLabel',{index:ui.index+1,label:ui.label,state:officeStateLabel(ui)}):t('officeZones.'+zone.kind+'.label')+' · '+(officeMoving?t('officeZones.'+zone.kind+'.hint'):t('officeResumeToUse'));tooltip.style.left=Math.max(115,Math.min(bounds.width-115,event.clientX-bounds.left))+'px';tooltip.style.top=Math.max(35,event.clientY-bounds.top-12)+'px';}
 };
 $('workspaceCanvas').onpointerleave=()=>{officeHover=null;officeHoverProp=null;$('workspaceTooltip').hidden=true;};
 $('workspaceCanvas').onclick=event=>{
  const hit=officeHit(event);if(!hit)return;
  if(hit.zone){officeSendTo(hit.zone.kind);return;}
  const ui=hit.agent;selectOfficeAgent(ui.id);
- if(officeMoving&&ui.activity!=='offline'){officeSay(ui,ui.activity==='working'?'Busy typing!':officePick(OFFICE_HELLO),2);ui.waveUntil=officeClock+1.6;}
+ if(officeMoving&&ui.activity!=='offline'){officeSay(ui,ui.activity==='working'?(currentLang==='pt-BR'?'Digitando a todo vapor!':'Busy typing!'):officePick(officeHelloList()),2);ui.waveUntil=officeClock+1.6;}
 };
 function officeLoop(time){
  if(!document.hidden&&time-lastOfficeFrame>=32){const delta=Math.min((time-lastOfficeFrame)/1000,.1);drawOffice(time,delta);lastOfficeFrame=time;}
@@ -887,42 +1033,47 @@ function officeLoop(time){
 }
 function onlineButton(text,cls,fn){const b=el('button',cls,text);b.dataset.online='';b.onclick=fn;return b;}
 function renderAccounts(s){
- const stamp=JSON.stringify([s.accounts,s.activeGroups,s.removingId,s.lowQuotaPercent,s.accounts.map(isStale)]);if(stamp===accountStamp)return;accountStamp=stamp;$('accounts').replaceChildren();
+ const stamp=JSON.stringify([s.accounts,s.activeGroups,s.removingId,s.lowQuotaPercent,s.accounts.map(isStale),currentLang]);if(stamp===accountStamp)return;accountStamp=stamp;$('accounts').replaceChildren();
  for(const a of s.accounts){
  const card=el('div','account '+(Object.values(s.activeGroups||{}).includes(a.id)?'active':'')),top=el('div','account-top'),left=el('div'),actions=el('div','row');left.append(el('div','name',a.label));if(a.email&&a.email!==a.label)left.append(el('div','email',a.email));
- if(a.id===s.removingId)actions.append(el('span','badge blocked','Removing…'));
- const use=onlineButton('Use','ghost',()=>act('/api/accounts/select',{id:a.id},'Selected '+a.label+'.'));use.dataset.action='select';
- const menu=el('details','account-menu'),title=el('summary','','•••'),options=el('div','menu');title.setAttribute('aria-label','Manage '+a.label);
- const rename=onlineButton('Rename','ghost',()=>{const label=prompt('Account label',a.label);if(label?.trim())act('/api/accounts/label',{id:a.id,label:label.trim()});});rename.dataset.action='rename';
- const remove=onlineButton('Remove','danger',()=>{if(confirm('Remove '+a.label+' and its saved pool credential? You can add it again by signing in.'))act('/api/accounts/remove',{id:a.id},'Removed '+a.label+'.');});remove.dataset.action='remove';
+ if(a.id===s.removingId)actions.append(el('span','badge blocked',t('badgeRemoving')));
+ const use=onlineButton(t('useBtn'),'ghost',()=>act('/api/accounts/select',{id:a.id},t('msgAccountSelected',{label:a.label})));use.dataset.action='select';
+ const menu=el('details','account-menu'),title=el('summary','','•••'),options=el('div','menu');title.setAttribute('aria-label',t('manageAria',{label:a.label}));
+ const rename=onlineButton(t('renameBtn'),'ghost',()=>{const label=prompt(t('promptRename'),a.label);if(label?.trim())act('/api/accounts/label',{id:a.id,label:label.trim()});});rename.dataset.action='rename';
+ const remove=onlineButton(t('removeBtn'),'danger',()=>{if(confirm(t('confirmRemove',{label:a.label})))act('/api/accounts/remove',{id:a.id},t('msgAccountRemoved',{label:a.label}));});remove.dataset.action='remove';
  options.append(rename,remove);menu.append(title,options);actions.append(use,menu);top.append(left,actions);
  const groups=el('div','quota-groups');groups.append(quotaGroup(a,s,'gemini','Gemini','var(--gemini)'),quotaGroup(a,s,'other','Claude / GPT','var(--other)'));card.append(top,groups);$('accounts').append(card);
- }if(!s.accounts.length)$('accounts').append(el('p','hint','Add your first account to get started.'));
+ }if(!s.accounts.length)$('accounts').append(el('p','hint',t('emptyAccounts')));
 }
 function renderProjects(){
- const stamp=JSON.stringify(preferences.projects);if(stamp===projectStamp)return;projectStamp=stamp;$('projects').replaceChildren();
+ const stamp=JSON.stringify([preferences.projects,currentLang]);if(stamp===projectStamp)return;projectStamp=stamp;$('projects').replaceChildren();
  for(const p of [...preferences.projects].sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.lastUsed-a.lastUsed)){
  const card=el('div','saved-project'),name=p.path.replace(/[\\/]+$/,'').split(/[\\/]/).pop()||p.path;card.append(el('strong','',(p.pinned?'★ ':'')+name),el('span','project-path',p.path));const row=el('div','row');
- const launch=onlineButton('Launch','primary',()=>launchProject(p.path));launch.dataset.action='launch';
- const pin=el('button','ghost',p.pinned?'Unpin':'Pin');pin.onclick=()=>{p.pinned=!p.pinned;savePreferences();renderProjects();};
- const forget=el('button','ghost','Forget');forget.title='Remove from this list; project files are kept';forget.onclick=()=>{preferences.projects=preferences.projects.filter(item=>identity(item.path)!==identity(p.path));savePreferences();renderProjects();};
+ const launch=onlineButton(t('launchBtn'),'primary',()=>launchProject(p.path));launch.dataset.action='launch';
+ const pin=el('button','ghost',p.pinned?t('unpinBtn'):t('pinBtn'));pin.onclick=()=>{p.pinned=!p.pinned;savePreferences();renderProjects();};
+ const forget=el('button','ghost',t('forgetBtn'));forget.title=t('forgetTitle');forget.onclick=()=>{preferences.projects=preferences.projects.filter(item=>identity(item.path)!==identity(p.path));savePreferences();renderProjects();};
  row.append(launch,pin,forget);card.append(row);$('projects').append(card);
- }if(!$('projects').children.length)$('projects').append(el('p','hint','Launch a project to remember it here, or pin a folder above. Saved in this browser.'));controls();
+ }if(!$('projects').children.length)$('projects').append(el('p','hint',t('emptyProjectsHint')));controls();
 }
 function category(t){if(/routing|switched .*before|retrying with the next/i.test(t))return 'switch';if(/quota|threshold/i.test(t))return 'quota';if(/opened antigravity/i.test(t))return 'project';if(/account|credential|sign.in/i.test(t)&&!/refreshed access token/i.test(t))return 'account';return 'system';}
 function renderEvents(){
- if(!current)return;const filter=$('eventFilter').value,stamp=JSON.stringify([current.events,filter]);if(stamp===eventStamp)return;eventStamp=stamp;$('events').replaceChildren();
- for(const e of current.events.filter(e=>filter==='all'||category(e.message)===filter).slice(0,10)){const kind=category(e.message),item=el('li','event '+kind),meta=el('div','event-meta');meta.append(el('span','badge',{switch:'Account switch',quota:'Quota',project:'Project',account:'Account',system:'Maintenance'}[kind]),el('span','time',new Date(e.at).toLocaleTimeString()));item.append(meta,el('div','',e.message));$('events').append(item);}
- if(!$('events').children.length)$('events').append(el('li','hint','No matching activity yet.'));
+ if(!current)return;const filter=$('eventFilter').value,stamp=JSON.stringify([current.events,filter,currentLang]);if(stamp===eventStamp)return;eventStamp=stamp;$('events').replaceChildren();
+ const dl=currentLang==='pt-BR'?'pt-BR':'en-US';
+ for(const e of current.events.filter(e=>filter==='all'||category(e.message)===filter).slice(0,10)){const kind=category(e.message),item=el('li','event '+kind),meta=el('div','event-meta');meta.append(el('span','badge',t('badge'+kind[0].toUpperCase()+kind.slice(1))),el('span','time',new Date(e.at).toLocaleTimeString(dl)));item.append(meta,el('div','',translateEvent(e.message)));$('events').append(item);}
+ if(!$('events').children.length)$('events').append(el('li','hint',t('noActivityYet')));
 }
 function controls(){
  const s=current,locked=!connected||busy||!s;for(const b of document.querySelectorAll('[data-online]'))b.disabled=locked;$('pinProject').disabled=!$('project').value.trim();if(!s)return;
- const accountBusy=!!s.enrollment||!!s.removingId;$('add').disabled=locked||accountBusy||s.launchBusy;$('launch').disabled=locked||accountBusy||s.launchBusy||!$('project').value.trim();$('checkQuota').disabled=locked||!s.accounts.length||!!s.removingId;$('test').disabled=locked||s.accounts.length<2||!s.lastRequestedModel||accountBusy;$('testLow').disabled=$('test').disabled||!s.lowQuotaPercent;$('refresh').disabled=locked||!s.accounts.length||accountBusy;
+ const accountBusy=!!s.enrollment||!!s.removingId;$('add').disabled=locked||accountBusy||s.launchBusy;$('launch').disabled=locked||accountBusy||s.launchBusy||!$('project').value.trim();$('checkQuota').disabled=locked||!s.accounts.length||!!s.removingId;$('test').disabled=locked||s.accounts.length<2||!s.lastRequestedModel||accountBusy;$('testLow').disabled=$('test').disabled||!s.lowQuotaPercent;$('refresh').disabled=locked||!s.accounts.length||accountBusy;$('toggleAutoApprove').disabled=locked||accountBusy;
  for(const b of document.querySelectorAll('[data-action]')){const a=b.dataset.action;b.disabled=locked||!!s.removingId||(a!=='rename'&&!!s.enrollment)||(a==='remove'&&s.accounts.length<2)||(a==='launch'&&s.launchBusy);}
 }
 function render(s){
- current=s;$('accountCount').textContent=s.accounts.length;renderWorkspace(s);renderAccounts(s);summary(s,'gemini');summary(s,'other');renderEvents();$('enrollment').textContent=s.enrollment?.message||'';$('cancel').hidden=!s.enrollment;$('model').textContent=s.lastRequestedModel||'No project prompt yet';$('group').textContent={gemini:'Gemini quota pool','3p':'Claude / GPT quota pool'}[s.lastRequestedGroup]||'';if(document.activeElement!==$('threshold'))$('threshold').value=s.lowQuotaPercent;
- const errors=s.accounts.filter(a=>a.quotaError).length;$('quotaWarning').hidden=!errors;$('quotaWarning').textContent=errors+' account quota check'+(errors===1?'':'s')+' unavailable. Quota error retry remains active.';controls();
+ current=s;$('accountCount').textContent=s.accounts.length;renderWorkspace(s);renderAccounts(s);summary(s,'gemini');summary(s,'other');renderEvents();$('enrollment').textContent=s.enrollment?.message||'';$('cancel').hidden=!s.enrollment;$('model').textContent=s.lastRequestedModel||t('noProjectPromptYet');$('group').textContent={gemini:t('geminiPoolLabel'),'3p':t('otherPoolLabel')}[s.lastRequestedGroup]||'';if(document.activeElement!==$('threshold'))$('threshold').value=s.lowQuotaPercent;
+ const autoApprove=!!s.autoApproveTools;const badge=$('autoApproveBadge');const btn=$('toggleAutoApprove');const desc=$('autoApproveDesc');
+ if(badge){badge.textContent=autoApprove?t('autoApproveActiveBadge'):t('autoApproveSafeBadge');badge.className='badge'+(autoApprove?' active-badge':'');}
+ if(btn){btn.textContent=autoApprove?t('autoApproveDisableBtn'):t('autoApproveEnableBtn');btn.setAttribute('aria-pressed',autoApprove?'true':'false');}
+ if(desc){desc.textContent=autoApprove?t('autoApproveActiveDesc'):t('autoApproveSafeDesc');}
+ const errors=s.accounts.filter(a=>a.quotaError).length;$('quotaWarning').hidden=!errors;$('quotaWarning').textContent=errors===1?t('quotaWarningSingular'):t('quotaWarningPlural',{count:errors});controls();
 }
 async function renewRequestKey(){const r=await fetch('/',{cache:'no-store',signal:AbortSignal.timeout(5000)});if(!r.ok)throw new Error('Could not reconnect to the pool.');const match=(await r.text()).match(/const key = '([0-9a-f]{64})'/);if(!match)throw new Error('Reload the dashboard to reconnect.');requestKey=match[1];}
 async function call(url,data={},retry=true){const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json','x-agy-pool-key':requestKey},body:JSON.stringify(data)});if(r.status===403&&retry){await renewRequestKey();return call(url,data,false);}const result=await r.json();if(!r.ok)throw new Error(result.error||'HTTP '+r.status);return result;}
@@ -934,14 +1085,16 @@ async function refresh(){
 async function act(url,data={},success){
  if(busy||!connected)return null;busy=true;controls();try{const s=await call(url,data);if(s.accounts)render(s);if(success)message(success);return s;}catch(e){message(e.message,true);return null;}finally{busy=false;controls();await refresh();}
 }
-async function launchProject(path){path=path.trim();if(!path){message('Enter a project folder first.',true);return;}$('project').value=path;saveForm();if(await act('/api/projects/launch',{path,resume:$('resume').checked},'Project CLI is opening in full auto mode.'))rememberProject(path);}
-$('project').addEventListener('input',saveForm);$('resume').addEventListener('change',saveForm);$('pinProject').onclick=()=>{const path=$('project').value.trim();if(path){saveForm();rememberProject(path,true);message('Project pinned.');}};$('launch').onclick=()=>launchProject($('project').value);$('eventFilter').onchange=renderEvents;
+async function launchProject(path){path=path.trim();if(!path){message(t('msgEnterProjectFolder'),true);return;}$('project').value=path;saveForm();const msg=current?.autoApproveTools?t('msgProjectOpeningAuto'):t('msgProjectOpeningSafe');if(await act('/api/projects/launch',{path,resume:$('resume').checked},msg))rememberProject(path);}
+$('project').addEventListener('input',saveForm);$('resume').addEventListener('change',saveForm);$('pinProject').onclick=()=>{const path=$('project').value.trim();if(path){saveForm();rememberProject(path,true);message(t('msgProjectPinned'));}};$('launch').onclick=()=>launchProject($('project').value);$('eventFilter').onchange=renderEvents;
+$('toggleAutoApprove').onclick=()=>{const next=!current?.autoApproveTools;act('/api/settings/auto-approve',{enabled:next},next?t('msgAutoApproveEnabled'):t('msgAutoApproveDisabled'));};
 $('theme').addEventListener('change',e=>applyTheme(e.target.value,true));
-$('add').onclick=()=>act('/api/accounts/add',{},'Sign in with a different Google account in the new CLI window.');$('cancel').onclick=()=>act('/api/accounts/cancel',{},'Original credential restored.');$('checkQuota').onclick=()=>act('/api/quota/check',{},'Refreshed both quota groups for all accounts.');
-$('test').onclick=()=>act('/api/diagnostics/next429',{},'Quota retry test armed. Send a small prompt in your project CLI.');$('testLow').onclick=()=>act('/api/diagnostics/nextlow',{},'Early switch test armed. Send a small prompt in your project CLI.');
-$('saveThreshold').onclick=()=>{const v=Number($('threshold').value);if(Number.isInteger(v)&&v>=0&&v<=100)act('/api/settings/threshold',{percent:v},'Switch threshold saved.');else message('Enter a whole percentage between 0 and 100.',true);};$('refresh').onclick=()=>act('/api/diagnostics/refresh',{id:current?.activeId},'The routing account renewed its access token.');
-$('stop').onclick=async()=>{if(busy||!connected||!confirm('Stop the pool? Open CLI sessions cannot send requests until it starts again.'))return;busy=true;controls();try{await call('/api/stop');stopped=true;connection('stopped');message('Pool stopped. Use the Desktop shortcut to start it again.');}catch(e){message(e.message,true);}finally{busy=false;controls();}};
-window.addEventListener('storage',e=>{if(e.key===THEME_STORAGE)loadTheme();if(e.key===STORAGE){loadPreferences();if(document.activeElement!==$('project'))$('project').value=preferences.path;$('resume').checked=preferences.resume;renderProjects();controls();}});
-loadTheme();loadPreferences();$('project').value=preferences.path;$('resume').checked=preferences.resume;renderProjects();controls();refresh();setInterval(refresh,2500);requestAnimationFrame(officeLoop);
+$('lang').addEventListener('change',e=>applyLanguage(e.target.value,true));
+$('add').onclick=()=>act('/api/accounts/add',{},t('msgSignInDifferentAccount'));$('cancel').onclick=()=>act('/api/accounts/cancel',{},t('msgOriginalCredentialRestored'));$('checkQuota').onclick=()=>act('/api/quota/check',{},t('msgQuotasRefreshed'));
+$('test').onclick=()=>act('/api/diagnostics/next429',{},t('msgTestRetryArmed'));$('testLow').onclick=()=>act('/api/diagnostics/nextlow',{},t('msgTestLowArmed'));
+$('saveThreshold').onclick=()=>{const v=Number($('threshold').value);if(Number.isInteger(v)&&v>=0&&v<=100)act('/api/settings/threshold',{percent:v},t('msgThresholdSaved'));else message(t('msgThresholdError'),true);};$('refresh').onclick=()=>act('/api/diagnostics/refresh',{id:current?.activeId},t('msgTokenRenewed'));
+$('stop').onclick=async()=>{if(busy||!connected||!confirm(t('confirmStop')))return;busy=true;controls();try{await call('/api/stop');stopped=true;connection('stopped');message(t('msgPoolStopped'));}catch(e){message(e.message,true);}finally{busy=false;controls();}};
+window.addEventListener('storage',e=>{if(e.key===THEME_STORAGE)loadTheme();if(e.key===LANG_STORAGE)loadLanguage();if(e.key===STORAGE){loadPreferences();if(document.activeElement!==$('project'))$('project').value=preferences.path;$('resume').checked=preferences.resume;renderProjects();controls();}});
+loadTheme();loadLanguage();loadPreferences();$('project').value=preferences.path;$('resume').checked=preferences.resume;renderProjects();controls();refresh();setInterval(refresh,2500);requestAnimationFrame(officeLoop);
 setInterval(()=>{for(const n of document.querySelectorAll('[data-reset]'))n.textContent=countdown(n.dataset.reset);if(current){renderAccounts(current);summary(current,'gemini');summary(current,'other');controls();}},10000);
 </script></body></html>
