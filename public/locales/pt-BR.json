@@ -241,5 +241,27 @@
   "msgTokenRenewed": "A conta de roteamento renovou seu token de acesso.",
   "msgPoolStopped": "Pool parado. Use o atalho da Área de Trabalho para iniciá-lo novamente.",
   "msgAccountSelected": "Selecionado: {label}.",
-  "msgAccountRemoved": "Removido: {label}."
+  "msgAccountRemoved": "Removido: {label}.",
+  "docTitle": "Pool de Contas Antigravity",
+  "agentPrefix": "Agente ",
+  "officeTypingBusy": "Digitando a todo vapor!",
+  "enrollmentSignInPrompt": "Faça login na nova janela do Antigravity CLI.",
+  "enrollmentAlreadyExists": "Essa conta Google já está no pool. Faça login com uma conta diferente.",
+  "errors": {
+    "launchBusy": "Aguarde o carregamento do CLI anterior terminar.",
+    "enrollmentBusy": "Um login de conta já está em andamento.",
+    "enrollmentCancelFirst": "Conclua ou cancele o login da conta atual primeiro.",
+    "keepOneAccount": "Mantenha pelo menos uma conta no pool.",
+    "unknownAccount": "Conta desconhecida.",
+    "labelLength": "Digite um nome de 1 a 80 caracteres.",
+    "addSecondAccount": "Adicione uma segunda conta primeiro.",
+    "sendPromptFirst": "Envie um prompt primeiro para identificar o modelo.",
+    "thresholdAboveZero": "Defina um limite de cota acima de 0% primeiro.",
+    "thresholdInvalid": "Digite uma porcentagem inteira entre 0 e 100.",
+    "projectNotDirectory": "O caminho do projeto deve ser um diretório.",
+    "removalBusy": "Aguarde a remoção da conta atual terminar.",
+    "invalidBoolean": "Enabled deve ser um booleano.",
+    "reconnectFailed": "Não foi possível reconectar ao pool.",
+    "reloadDashboard": "Recarregue o painel para reconectar."
+  }
 }

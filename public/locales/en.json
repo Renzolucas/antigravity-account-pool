@@ -241,5 +241,27 @@
   "msgTokenRenewed": "The routing account renewed its access token.",
   "msgPoolStopped": "Pool stopped. Use the Desktop shortcut to start it again.",
   "msgAccountSelected": "Selected {label}.",
-  "msgAccountRemoved": "Removed {label}."
+  "msgAccountRemoved": "Removed {label}.",
+  "docTitle": "Antigravity Account Pool",
+  "agentPrefix": "Agent ",
+  "officeTypingBusy": "Busy typing!",
+  "enrollmentSignInPrompt": "Sign in in the new Antigravity CLI window.",
+  "enrollmentAlreadyExists": "That Google account is already in the pool. Sign into a different account.",
+  "errors": {
+    "launchBusy": "Wait for the previous CLI launch to finish loading.",
+    "enrollmentBusy": "An account login is already in progress.",
+    "enrollmentCancelFirst": "Finish or cancel the current account login first.",
+    "keepOneAccount": "Keep at least one account in the pool.",
+    "unknownAccount": "Unknown account.",
+    "labelLength": "Enter a label of 1 to 80 characters.",
+    "addSecondAccount": "Add a second account first.",
+    "sendPromptFirst": "Send a prompt first so the selected model is known.",
+    "thresholdAboveZero": "Set a quota threshold above 0% first.",
+    "thresholdInvalid": "Enter a whole percentage between 0 and 100.",
+    "projectNotDirectory": "Project path must be a directory.",
+    "removalBusy": "Wait for the current account removal to finish.",
+    "invalidBoolean": "Enabled must be a boolean.",
+    "reconnectFailed": "Could not reconnect to the pool.",
+    "reloadDashboard": "Reload the dashboard to reconnect."
+  }
 }
