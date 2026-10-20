@@ -5,8 +5,9 @@ import { randomUUID, randomBytes } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { requestedModel, quotaBuckets, quotaForModel, quotaGroup, quotaWindowsForModel, quotaPools, quotaResetMs, chooseAccountForModel, isAuxiliaryModel, orderAccountsForGroup } from './quota-policy.mjs';
+import { requestedModel, quotaBuckets, quotaForModel, quotaGroup, quotaWindowsForModel, quotaPools, quotaResetMs, chooseAccountForModel, isAuxiliaryModel, orderAccountsForGroup, extractUsageMetadata, estimatePromptTokens, formatQuotaWindow, classifyQuotaError } from './quota-policy.mjs';
 import { installedOAuthClient } from './oauth-client.mjs';
+import { createConsumptionTracker } from './consumption-tracker.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(root, 'data');
@@ -41,6 +42,7 @@ const idleWaiters = new Map();
 // Transient UI activity. No prompt, response, or token content is retained here.
 const modelWork = new Map();
 let saveQueue = Promise.resolve();
+const consumptionTracker = createConsumptionTracker({ dataDir });
 
 function beginModelWork(id, model) {
   const work = modelWork.get(id) || { inFlight: 0, lastModel: null, lastStartedAt: null, lastFinishedAt: null };
@@ -178,6 +180,7 @@ async function recoverCredential() {
 }
 async function bootstrap() {
   await fs.mkdir(dataDir, { recursive: true });
+  await consumptionTracker.load();
   try { meta = JSON.parse(await fs.readFile(metaPath, 'utf8')); }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
   meta.accounts ||= [];
@@ -216,22 +219,48 @@ function isQuotaError(status, message) {
 function quotaShape(payload) {
   return { rootKeys: Object.keys(payload || {}), buckets: quotaBuckets(payload) };
 }
+function quotaRequestBody() {
+  if (quotaRequestTemplate?.body?.length) {
+    try {
+      const parsed = JSON.parse(quotaRequestTemplate.body.toString('utf8'));
+      if (parsed?.project) return quotaRequestTemplate.body;
+    } catch {}
+  }
+  return Buffer.from(JSON.stringify({ project: 'aicode-consumers' }), 'utf8');
+}
+function quotaRequestHeaders() {
+  const allowed = ['content-type', 'accept', 'user-agent', 'x-goog-api-client', 'x-goog-user-project'];
+  const headers = { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'antigravity' };
+  if (quotaRequestTemplate?.headers) {
+    for (const key of allowed) {
+      if (quotaRequestTemplate.headers[key]) headers[key] = quotaRequestTemplate.headers[key];
+    }
+  }
+  return headers;
+}
 async function fetchQuotaSummary(account) {
-  const request = (quotaRequestTemplate?.accountId === account.id ? quotaRequestTemplate : null) || {
-    headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'antigravity' },
-    body: Buffer.from('{}'),
-  };
-  const upstream = { method: 'POST', url: '/v1internal:retrieveUserQuotaSummary', headers: request.headers };
-  let response = await upstreamRequest(upstream, request.body, await accessToken(account), 8_000);
+  const requestBody = quotaRequestBody();
+  const requestHeaders = quotaRequestHeaders();
+  const upstream = { method: 'POST', url: '/v1internal:retrieveUserQuotaSummary', headers: requestHeaders };
+  let response = await upstreamRequest(upstream, requestBody, await accessToken(account), 10_000);
   if (response.statusCode === 401) {
     await collect(response);
-    response = await upstreamRequest(upstream, request.body, await accessToken(account, true), 8_000);
+    response = await upstreamRequest(upstream, requestBody, await accessToken(account, true), 10_000);
   }
   const raw = await collect(response, 2_000_000);
+  const rawText = raw.toString('utf8');
   if (response.statusCode < 200 || response.statusCode >= 300) {
-    throw new Error(`Quota check returned HTTP ${response.statusCode}.`);
+    let errorMsg = `HTTP ${response.statusCode}`;
+    try {
+      const parsed = JSON.parse(rawText);
+      if (parsed.error?.message) errorMsg = parsed.error.message;
+    } catch {}
+    const err = new Error(`Quota check failed (${errorMsg})`);
+    err.statusCode = response.statusCode;
+    err.detail = rawText;
+    throw err;
   }
-  return JSON.parse(raw.toString('utf8'));
+  return JSON.parse(rawText);
 }
 async function checkedQuota(account, force = false) {
   const cached = quotaCache.get(account.id);
@@ -246,7 +275,14 @@ async function checkedQuota(account, force = false) {
       quotaCheckError = null;
       return payload;
     } catch (error) {
-      quotaCache.set(account.id, { payload: null, checkedAt: Date.now(), error: error.message });
+      const errInfo = {
+        code: error.statusCode || 0,
+        type: classifyQuotaError(error),
+        message: error.message,
+        detail: error.detail?.slice(0, 300) || null,
+        checkedAt: Date.now(),
+      };
+      quotaCache.set(account.id, { payload: null, checkedAt: Date.now(), error: errInfo });
       quotaCheckError = `Quota check unavailable: ${error.message.slice(0, 120)}`;
       return null;
     } finally {
@@ -320,6 +356,7 @@ async function proxy(req, res) {
     return;
   }
   const body = await readBody(req, maxRequestBytes);
+  const requestId = req.headers['x-request-id'] || randomUUID();
   let quotaTemplateCandidate = null;
   if (req.url.includes('retrieveUserQuotaSummary')) {
     const allowed = ['content-type', 'accept', 'user-agent', 'x-goog-api-client', 'x-goog-user-project'];
@@ -341,6 +378,13 @@ async function proxy(req, res) {
     try {
     if (choice.firstLow != null && account.id !== choice.preferredId) {
       note(`Switched ${model} before a request: selected account was at ${Math.round(choice.firstLow * 100)}% (threshold ${meta.lowQuotaPercent}%).`);
+      consumptionTracker.recordSwitch({
+        model,
+        fromAccountId: choice.preferredId,
+        toAccountId: account.id,
+        reason: 'low_quota',
+        message: `Selected account was at ${Math.round(choice.firstLow * 100)}% (threshold ${meta.lowQuotaPercent}%)`
+      });
     }
     let token = await accessToken(account);
     let response;
@@ -363,8 +407,16 @@ async function proxy(req, res) {
         const until = Date.now() + quotaResetMs(errorText);
         if (model) account.blockedByModel[quotaGroup(model)] = until;
         else account.blockedUntil = until;
-        note(`${account.label} reached its ${quotaGroup(model) || 'account'} quota; ${availableAccounts(tried, quotaGroup(model)).length ? 'retrying with the next account' : 'no other account is available'}.`);
-        if (availableAccounts(tried, quotaGroup(model)).length > 0) continue;
+        const availableNext = availableAccounts(tried, quotaGroup(model));
+        note(`${account.label} reached its ${quotaGroup(model) || 'account'} quota; ${availableNext.length ? 'retrying with the next account' : 'no other account is available'}.`);
+        consumptionTracker.recordSwitch({
+          model,
+          fromAccountId: account.id,
+          toAccountId: availableNext[0]?.id || null,
+          reason: 'quota_exhausted',
+          message: errorText.slice(0, 160)
+        });
+        if (availableNext.length > 0) continue;
       }
       relayBuffered(res, 429, response.headers, errorBody);
       return;
@@ -386,11 +438,68 @@ async function proxy(req, res) {
       meta.activeByModel[group] = account.id;
       if (previous !== account.id) note(`Now routing ${group} requests through ${account.label}.`);
     }
-    if (response.syntheticBody) { relayBuffered(res, response.statusCode, response.headers, response.syntheticBody); return; }
+    if (response.syntheticBody) {
+      if (trackedWork) {
+        consumptionTracker.recordRequest({
+          requestId,
+          accountId: account.id,
+          model,
+          promptTokens: estimatePromptTokens(body),
+          candidatesTokens: Math.max(0, Math.ceil(response.syntheticBody.length / 4)),
+          isExact: false,
+          statusCode: response.statusCode || 200,
+          durationMs: 50,
+        });
+      }
+      relayBuffered(res, response.statusCode, response.headers, response.syntheticBody);
+      return;
+    }
+    const reqStartMs = Date.now();
+    let usageMeta = null;
+    let responseCharCount = 0;
+    let chunkTail = '';
+
+    response.on('data', chunk => {
+      const chunkStr = chunk.toString('utf8');
+      const combined = chunkTail + chunkStr;
+      const meta = extractUsageMetadata(combined);
+      if (meta) {
+        usageMeta = meta;
+      }
+      chunkTail = chunkStr.slice(-200);
+      responseCharCount += chunkStr.length;
+    });
+
     res.writeHead(response.statusCode || 502, response.headers);
     response.pipe(res);
     res.on('close', () => response.destroy());
     await new Promise(resolve => res.once('close', resolve));
+
+    if (trackedWork && response.statusCode >= 200 && response.statusCode < 300) {
+      const durationMs = Date.now() - reqStartMs;
+      let promptTokens = 0;
+      let candidatesTokens = 0;
+      let isExact = false;
+      if (usageMeta) {
+        promptTokens = usageMeta.promptTokens;
+        candidatesTokens = usageMeta.candidatesTokens;
+        isExact = true;
+      } else {
+        promptTokens = estimatePromptTokens(body);
+        candidatesTokens = Math.max(0, Math.ceil(responseCharCount / 4));
+        isExact = false;
+      }
+      consumptionTracker.recordRequest({
+        requestId,
+        accountId: account.id,
+        model,
+        promptTokens,
+        candidatesTokens,
+        isExact,
+        statusCode: response.statusCode,
+        durationMs,
+      });
+    }
     return;
     } finally {
       if (trackedWork) endModelWork(account.id);
@@ -466,9 +575,17 @@ async function pollEnrollment() {
 function status() {
   const model = lastRequestedModel;
   const group = quotaGroup(model);
-  const displayWindow = window => window ? {
-    percent: Math.round(window.remainingFraction * 100), resetTime: window.resetTime,
-  } : null;
+  const activeGeminiId = meta.activeByModel.gemini || meta.activeId;
+  const activeOtherId = meta.activeByModel['3p'] || meta.activeId;
+  const activeGemini = meta.accounts.find(a => a.id === activeGeminiId) || null;
+  const activeOther = meta.accounts.find(a => a.id === activeOtherId) || null;
+
+  let lastCheckedAt = 0;
+  for (const a of meta.accounts) {
+    const t = quotaCache.get(a.id)?.checkedAt || 0;
+    if (t > lastCheckedAt) lastCheckedAt = t;
+  }
+
   return {
     accounts: meta.accounts.map(({ id, email, label, blockedUntil, blockedByModel }) => {
       const cached = quotaCache.get(id);
@@ -476,23 +593,60 @@ function status() {
       const windows = model && cached?.payload ? quotaWindowsForModel(cached.payload, model) : [];
       const pools = quotaPools(cached?.payload);
       const work = modelWork.get(id);
-      return { id, email, label, blockedUntil,
+      const geminiBlocked = Number(blockedByModel?.gemini || blockedUntil || 0);
+      const otherBlocked = Number(blockedByModel?.['3p'] || blockedUntil || 0);
+
+      return {
+        id, email, label, blockedUntil,
         work: work ? { inFlight: work.inFlight, lastModel: work.lastModel,
           lastStartedAt: work.lastStartedAt, lastFinishedAt: work.lastFinishedAt } : null,
         modelBlockedUntil: group ? Number(blockedByModel?.[group] || 0) : 0,
-        blockedGroups: { gemini: Number(blockedByModel?.gemini || 0), other: Number(blockedByModel?.['3p'] || 0) },
+        blockedGroups: { gemini: geminiBlocked, other: otherBlocked },
         quotaRemainingPercent: quota ? Math.round(quota.remainingFraction * 100) : null,
         quotaWindows: windows.map(item => ({ id: item.modelId, percent: Math.round(item.remainingFraction * 100) })),
         quotaPools: {
-          gemini: { fiveHour: displayWindow(pools.gemini.fiveHour), weekly: displayWindow(pools.gemini.weekly) },
-          other: { fiveHour: displayWindow(pools.other.fiveHour), weekly: displayWindow(pools.other.weekly) },
+          gemini: {
+            fiveHour: formatQuotaWindow(pools.gemini.fiveHour, geminiBlocked),
+            weekly: formatQuotaWindow(pools.gemini.weekly, geminiBlocked),
+          },
+          other: {
+            fiveHour: formatQuotaWindow(pools.other.fiveHour, otherBlocked),
+            weekly: formatQuotaWindow(pools.other.weekly, otherBlocked),
+          },
         },
         quotaCheckedAt: cached?.checkedAt || null,
-        quotaError: cached?.error || null };
+        quotaError: cached?.error || null,
+        consumption: consumptionTracker.getAccountConsumption(id),
+      };
     }),
     activeId: (group && meta.activeByModel[group]) || meta.activeId, events: meta.events,
-    activeGroups: { gemini: meta.activeByModel.gemini || meta.activeId,
-      other: meta.activeByModel['3p'] || meta.activeId },
+    activeGroups: { gemini: activeGeminiId, other: activeOtherId },
+    activeAccountSummary: {
+      gemini: activeGemini ? {
+        id: activeGemini.id,
+        label: activeGemini.label,
+        email: activeGemini.email,
+        lastModel: modelWork.get(activeGemini.id)?.lastModel || null,
+        blocked: Number(activeGemini.blockedByModel?.gemini || activeGemini.blockedUntil || 0) > Date.now(),
+      } : null,
+      other: activeOther ? {
+        id: activeOther.id,
+        label: activeOther.label,
+        email: activeOther.email,
+        lastModel: modelWork.get(activeOther.id)?.lastModel || null,
+        blocked: Number(activeOther.blockedByModel?.['3p'] || activeOther.blockedUntil || 0) > Date.now(),
+      } : null,
+    },
+    consumption: (() => {
+      const totals = consumptionTracker.getTotals();
+      if (totals.lastRequest?.accountId) {
+        const acc = meta.accounts.find(a => a.id === totals.lastRequest.accountId);
+        totals.lastRequest.accountLabel = acc ? acc.label : totals.lastRequest.accountId;
+      }
+      return totals;
+    })(),
+    refreshing: quotaChecks.size > 0,
+    lastCheckedAt: lastCheckedAt || null,
     enrollment: enrollment ? { message: enrollment.message || 'Sign in in the new Antigravity CLI window.', deadline: enrollment.deadline } : null,
     removingId: removingAccounts.values().next().value || null,
     lastRequestedModel,
@@ -571,6 +725,7 @@ async function api(req, res) {
       snapshots.delete(account.id);
       quotaCache.delete(account.id);
       modelWork.delete(account.id);
+      consumptionTracker.deleteAccount(account.id);
       meta.accounts = meta.accounts.filter(item => item.id !== account.id);
       for (const [model, id] of Object.entries(meta.activeByModel)) {
         if (id === account.id) delete meta.activeByModel[model];

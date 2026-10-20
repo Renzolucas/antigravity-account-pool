@@ -123,3 +123,130 @@ export function quotaResetMs(message) {
     Number(match[3] || 0) * 3600 + Number(match[4] || 0) * 60 + Number(match[5] || 0);
   return Math.max(60_000, seconds * 1000);
 }
+
+export function extractUsageMetadata(text) {
+  if (typeof text !== 'string') return null;
+  const marker = '"usageMetadata"';
+  let lastMeta = null;
+  let idx = text.indexOf(marker);
+
+  while (idx !== -1) {
+    const braceStart = text.indexOf('{', idx + marker.length);
+    if (braceStart === -1) break;
+
+    let depth = 1;
+    let endIdx = -1;
+    let inString = false;
+    let escape = false;
+
+    for (let i = braceStart + 1; i < text.length; i++) {
+      const char = text[i];
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (char === '\\') {
+        escape = true;
+        continue;
+      }
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+      if (!inString) {
+        if (char === '{') depth++;
+        else if (char === '}') {
+          depth--;
+          if (depth === 0) {
+            endIdx = i;
+            break;
+          }
+        }
+      }
+    }
+
+    const jsonStr = endIdx !== -1 ? text.slice(braceStart, endIdx + 1) : text.slice(braceStart);
+    try {
+      const parsed = JSON.parse(jsonStr);
+      const promptTokens = Number(parsed.promptTokenCount) || 0;
+      const candidatesTokens = Number(parsed.candidatesTokenCount) || 0;
+      const totalTokens = Number(parsed.totalTokenCount) || (promptTokens + candidatesTokens);
+      if (parsed.promptTokenCount != null || parsed.candidatesTokenCount != null || parsed.totalTokenCount != null) {
+        lastMeta = { promptTokens, candidatesTokens, totalTokens };
+      }
+    } catch {
+      const pMatch = jsonStr.match(/"promptTokenCount"\s*:\s*(\d+)/);
+      const cMatch = jsonStr.match(/"candidatesTokenCount"\s*:\s*(\d+)/);
+      const tMatch = jsonStr.match(/"totalTokenCount"\s*:\s*(\d+)/);
+      if (pMatch || cMatch || tMatch) {
+        const promptTokens = pMatch ? Number(pMatch[1]) : 0;
+        const candidatesTokens = cMatch ? Number(cMatch[1]) : 0;
+        const totalTokens = tMatch ? Number(tMatch[1]) : (promptTokens + candidatesTokens);
+        lastMeta = { promptTokens, candidatesTokens, totalTokens };
+      }
+    }
+
+    if (endIdx === -1) break;
+    idx = text.indexOf(marker, endIdx + 1);
+  }
+
+  return lastMeta;
+}
+
+export function estimateTokensFromText(text) {
+  if (!text || typeof text !== 'string') return 0;
+  return Math.max(1, Math.ceil(text.length / 4));
+}
+
+export function estimatePromptTokens(requestBody) {
+  try {
+    const parsed = typeof requestBody === 'string' ? JSON.parse(requestBody) : JSON.parse(requestBody.toString('utf8'));
+    const contents = parsed.contents || parsed.request?.contents || [];
+    let chars = 0;
+    if (Array.isArray(contents)) {
+      for (const item of contents) {
+        if (Array.isArray(item.parts)) {
+          for (const p of item.parts) {
+            if (typeof p.text === 'string') chars += p.text.length;
+          }
+        }
+      }
+    }
+    if (chars === 0) return 0;
+    return Math.max(1, Math.ceil(chars / 4));
+  } catch {
+    return 0;
+  }
+}
+
+export function formatQuotaWindow(window, blockedUntilMs = 0) {
+  const now = Date.now();
+  if (blockedUntilMs && Number(blockedUntilMs) > now) {
+    return {
+      percent: 0,
+      resetTime: new Date(Number(blockedUntilMs)).toISOString(),
+      status: 'blocked'
+    };
+  }
+  if (!window || window.remainingFraction == null) {
+    return {
+      percent: null,
+      resetTime: null,
+      status: 'not_provided'
+    };
+  }
+  return {
+    percent: Math.max(0, Math.min(100, Math.round(window.remainingFraction * 100))),
+    resetTime: window.resetTime || null,
+    status: 'confirmed'
+  };
+}
+
+export function classifyQuotaError(error) {
+  const code = error?.statusCode || error?.status || 0;
+  if (code === 401) return 'auth_expired';
+  if (code === 403) return 'permission_denied';
+  if (code === 429) return 'rate_limited';
+  if (/timeout|ETIMEDOUT|ECONNRESET|ENOTFOUND|timed out/i.test(error?.message || '')) return 'network_error';
+  return 'api_error';
+}

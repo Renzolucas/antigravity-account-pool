@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { requestedModel, quotaForModel, quotaGroup, quotaPools, quotaResetMs, chooseAccountForModel, isAuxiliaryModel, orderAccountsForGroup } from './quota-policy.mjs';
+import { requestedModel, quotaForModel, quotaGroup, quotaPools, quotaResetMs, chooseAccountForModel, isAuxiliaryModel, orderAccountsForGroup, extractUsageMetadata, estimateTokensFromText, estimatePromptTokens, formatQuotaWindow, classifyQuotaError } from './quota-policy.mjs';
 
 const quotas = {
   buckets: [
@@ -67,4 +67,46 @@ test('reads model from generation request and parses weekly reset delays', () =>
   assert.equal(requestedModel('/v1internal:loadCodeAssist', Buffer.from('{"model":"gemini-3.8-flash"}')), null);
   assert.equal(quotaResetMs('Individual quota reached. Resets in 1w2d3h4m5s.'),
     ((7 + 2) * 24 * 3600 + 3 * 3600 + 4 * 60 + 5) * 1000);
+});
+
+test('extractUsageMetadata parses prompt and candidate token counts from chunks', () => {
+  const sseChunk = 'data: {"response": {"candidates": [{"content": {"role": "model","parts": [{"text": "Hello"}]}}],"usageMetadata": {"promptTokenCount": 42,"candidatesTokenCount": 18,"totalTokenCount": 60}}}';
+  const meta = extractUsageMetadata(sseChunk);
+  assert.deepEqual(meta, { promptTokens: 42, candidatesTokens: 18, totalTokens: 60 });
+  assert.equal(extractUsageMetadata('data: {"response": {}}'), null);
+});
+
+test('estimateTokensFromText and estimatePromptTokens provide fallback token metrics', () => {
+  assert.equal(estimateTokensFromText('Hello world!'), 3);
+  assert.equal(estimateTokensFromText(''), 0);
+
+  const req = Buffer.from(JSON.stringify({
+    contents: [
+      { parts: [{ text: '12345678' }] }
+    ]
+  }));
+  assert.equal(estimatePromptTokens(req), 2);
+  assert.equal(estimatePromptTokens(Buffer.from('{}')), 0);
+});
+
+test('formatQuotaWindow differentiates confirmed, not_provided, and blocked states', () => {
+  const confirmed = formatQuotaWindow({ remainingFraction: 0.85, resetTime: '2026-10-26T00:00:00Z' });
+  assert.deepEqual(confirmed, { percent: 85, resetTime: '2026-10-26T00:00:00Z', status: 'confirmed' });
+
+  const notProvided = formatQuotaWindow(null);
+  assert.deepEqual(notProvided, { percent: null, resetTime: null, status: 'not_provided' });
+
+  const future = Date.now() + 60000;
+  const blocked = formatQuotaWindow({ remainingFraction: 1.0 }, future);
+  assert.equal(blocked.status, 'blocked');
+  assert.equal(blocked.percent, 0);
+});
+
+test('classifyQuotaError correctly categorizes HTTP codes and network failures', () => {
+  assert.equal(classifyQuotaError({ statusCode: 401 }), 'auth_expired');
+  assert.equal(classifyQuotaError({ statusCode: 403 }), 'permission_denied');
+  assert.equal(classifyQuotaError({ statusCode: 429 }), 'rate_limited');
+  assert.equal(classifyQuotaError({ message: 'Google request timed out.' }), 'network_error');
+  assert.equal(classifyQuotaError({ message: 'connect ETIMEDOUT 142.250.190.42:443' }), 'network_error');
+  assert.equal(classifyQuotaError({ statusCode: 500 }), 'api_error');
 });
